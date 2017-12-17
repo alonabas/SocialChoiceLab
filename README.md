@@ -1,1 +1,1 @@
-# SocialChoiceLab
+# Social Choice Lab
