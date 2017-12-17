@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require("fs");
 var turf = require('@turf/intersect');
+var turf1 = require('@turf/centroid');
 var fs = require('fs');
 
 var defaultDiacriticsRemovalMap = [
@@ -91,8 +92,7 @@ var defaultDiacriticsRemovalMap = [
   ];
 
 
-function mergeFiles(dataFile,geoJsonFile, isGeo){
-    console.log(isGeo)
+function mergeFiles(dataFile,geoJsonFile, fullOutputFile){
     var name, county, district, temp;
     var results, total, dem, rep;
     for (var entry in geoJsonFile.features){
@@ -117,7 +117,6 @@ function mergeFiles(dataFile,geoJsonFile, isGeo){
                 }
                 return entry.county.toLowerCase() == county.toLowerCase() && parseInt(precinct) == entry.precinct
             });
-    
             console.log(county)
             console.log(precinct)
             console.log(district)
@@ -143,9 +142,16 @@ function mergeFiles(dataFile,geoJsonFile, isGeo){
         geoJsonFile.features[entry].properties.total = total
         geoJsonFile.features[entry].properties.all = results
     }
+
+    var geojsonData = JSON.stringify(geoJsonFile);
+    fs.writeFile(fullOutputFile, geojsonData, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+    });
+
     var count = 0
     for (var i = 0; i < geoJsonFile.features.length; i++){
-        console.log(i)
         for (var j = parseInt(i)+1; j< geoJsonFile.features.length; j++){
             var intersection = turf(geoJsonFile.features[i], geoJsonFile.features[j])
             if (intersection){
@@ -159,35 +165,10 @@ function mergeFiles(dataFile,geoJsonFile, isGeo){
                 geoJsonFile.features[j].properties.neighbours.push(i)
             }
         }
+        geoJsonFile.features[i].center = turf1(geoJsonFile.features[i].geometry).geometry;
+        geoJsonFile.features[i].geometry = {}
+        console.log(geoJsonFile.features[i])
     }
-    console.log(isGeo)
-    if (!isGeo){
-        geoJsonFile.features.map(function(entry){
-            entry.geometry = {};
-            return entry;
-        })
-    }
-    return geoJsonFile;
-    /*
-    for (var entry in dataFile){
-        var name = dataFile[entry].county + ' County Precinct ' + dataFile[entry].precinct
-        var found = geoJsonFile.features.filter(function(entryTemp){
-            var temp = entryTemp.properties.NAME10
-            for (var i in defaultDiacriticsRemovalMap){
-                temp = temp.replace(defaultDiacriticsRemovalMap[i].letters, defaultDiacriticsRemovalMap[i].base) 
-                name = name.replace(defaultDiacriticsRemovalMap[i].letters, defaultDiacriticsRemovalMap[i].base) 
-                
-            }
-
-            return temp.toLowerCase() == name.toLowerCase()
-        })
-        if (found.length == 0){
-            console.log('Not Found in Data')
-            console.log(dataFile[entry])
-        }
-    }
-*/
-
     return geoJsonFile;
 }
 
@@ -199,14 +180,15 @@ function readJsonFileSync(filepath, encoding){
     return JSON.parse(file);
 }
 
-function buildJsonFile(folder, state, outputFile, isGeo){
+function buildJsonFile(folder, state, outputFile, fullOutputFile){
+    console.log(fullOutputFile)
     var path_to_use = '.'+folder + state + '/'
     json = readJsonFileSync(path.join(__dirname, path_to_use+'data.json'), 'utf8')
     json = json.filter(function(entry){
         return entry.office == 'House';
     })
     geoJson = readJsonFileSync(path.join(__dirname, path_to_use+'geo.json'), 'utf8')
-    var jsonFinal = mergeFiles(json, geoJson, isGeo)
+    var jsonFinal = mergeFiles(json, geoJson, fullOutputFile)
     var geojsonData = JSON.stringify(jsonFinal);
     fs.writeFile(outputFile, geojsonData, function(err) {
         if(err) {

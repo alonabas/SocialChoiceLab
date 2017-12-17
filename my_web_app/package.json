@@ -9,6 +9,7 @@
   "author": "Alona",
   "license": "MIT",
   "dependencies": {
+    "@turf/centroid": "^5.1.5",
     "@turf/intersect": "^5.1.5",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",

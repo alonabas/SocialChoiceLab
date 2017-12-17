@@ -1,6 +1,5 @@
 var jsonData;
 var geoJsonData;
-var geoJsonData1;
 var randomCube;
 
 function getJson(callback) {
@@ -221,5 +220,129 @@ function buildEdges(){
     })
     return neightbours;
 }
+
+function smartGraphBuilder(){
+    var stack = [];
+    stack.push(jsonData.features[0]);
+    var x =0, y = 0, z = 0;
+    while(stack.length > 0){
+        var elem = stack.pop();
+        elem.plotly = {}
+        elem.plotly.x = x;
+        elem.plotly.y = y;
+        elem.plotly.z = z;
+        var len = elem.properties.neighbours.length;
+        elem.properties.neighbours.forEach(function(neighbour){
+            stack.push()
+
+        });
+
+    }
+}
+
+function renderMap(){
+    Plotly.d3.json('/getGeoJsonRep', function(redjson) {
+    Plotly.d3.json('/getDistricts', function(redjson) {
+    Plotly.d3.json('/getGeoJsonDem', function(bluejson) {
+        
+            Plotly.newPlot("map", [{
+              type: 'scattermapbox',
+              lat: [46],
+              lon: [-74]
+            }], {
+              title: "Florida Counties",
+              height: 600,
+              width: 600,
+              mapbox: {
+                center: {
+                  lat: 34,
+                  lon: -106
+                },
+                style: 'light',
+                zoom: 4.8,
+                layers: [
+                  {
+                    sourcetype: 'geojson',
+                    source: bluejson,
+                    type: 'fill',
+                    color: 'rgba(30,44,255,0.8)'
+                  },   
+                  {
+                    sourcetype: 'geojson',
+                    source: redjson,
+                    type: 'fill',
+                    color: 'rgba(40,0,113,0.8)'
+                  },        
+                ]
+              }
+            }, {
+              mapboxAccessToken: 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ'
+            });
+              
+            
+        });
+    });
+}
+
+function oneMoreRender(){
+    Plotly.d3.json('/getGeoJson', function(bluejson) {
+        
+            Plotly.newPlot("map", [{
+              type: 'scattermapbox',
+              lat: [46],
+              lon: [-74]
+            }], {
+              title: "Florida Counties",
+              height: 600,
+              width: 600,
+              mapbox: {
+                center: {
+                  lat: 34,
+                  lon: -106
+                },
+                style: 'light',
+                zoom: 4.8,
+                layers: [
+                  {
+                    sourcetype: 'geojson',
+                    source: bluejson,
+                    type: 'fill',
+                    color: 'rgba(40,0,113,0.8)'
+                  },        
+                ]
+              }
+            }, {
+              mapboxAccessToken: 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ'
+            });
+              
+            
+        });
+}
+
+function otherMapRender(){
+    /*console.log(geoJsonData)
+    var temp = geoJsonData.features.filter(function(entry){
+        return entry.properties.uscong_dis == 1;
+    })
+    var allTemp = {};
+    allTemp.type = "FeatureCollection"
+    allTemp.features = temp
+    */
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ';
+    var map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/outdoors-v9",
+        center: [-106, 34],
+        zoom: 4
+    });
+    
+    map.on("load", function() {
+        map.addSource("national-park", {
+            "type": "geojson",
+            "data": '/getGeoJson'
+            })
+        });
+}
+
 
 buildCubeForData();
