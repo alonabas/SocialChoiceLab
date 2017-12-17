@@ -1,0 +1,20 @@
+{
+  "name": "arizona_elections",
+  "version": "1.0.0",
+  "description": "Election to House of Representatives 2016",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alona",
+  "license": "MIT",
+  "dependencies": {
+    "@turf/intersect": "^5.1.5",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "jquery": "^3.2.1",
+    "pug": "^2.0.0-rc.4",
+    "xtend": "^4.0.1"
+  }
+}

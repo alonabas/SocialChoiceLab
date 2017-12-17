@@ -1,0 +1,15 @@
+my_web_app/node_modules
+my_web_app/package-lock.json
+my_web_app/.DS_Store
+my_web_app/result.json
+.DS_Store
+.idea/
+*.pyc
+*.py
+az_final.json
+az_precincts.geojson
+defaults.cfg
+electionneighgeo.json
+my_json.json
+my_json.txt
+pima_geojson.js
