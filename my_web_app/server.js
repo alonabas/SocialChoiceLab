@@ -19,6 +19,8 @@ else{
   json = helper.buildJsonFile(config.default_path,config.state, config.ready_data_path, config.is_geo)
 }
 
+var geoJson = helper.readJsonFileSync(path.join(__dirname, config.default_path+config.state + '/geo.json'), 'utf8')
+
 app.use('/public', express.static(__dirname + '/public'))
 app.use('/node_modules', express.static(__dirname + '/node_modules'))
 app.get('/', function(req, res) {
@@ -30,6 +32,10 @@ app.get('/', function(req, res) {
 
 app.get('/getJson', function(req, res) {
   res.send(JSON.stringify(json));
+});
+
+app.get('/getGeoJson', function(req, res) {
+  res.send(JSON.stringify(geoJson));
 });
 
 console.log('starting') 
