@@ -250,7 +250,7 @@ function renderMap(){
               lat: [46],
               lon: [-74]
             }], {
-              title: "Florida Counties",
+              title: "New Mexico districts",
               height: 600,
               width: 600,
               mapbox: {
@@ -271,7 +271,7 @@ function renderMap(){
                     sourcetype: 'geojson',
                     source: redjson,
                     type: 'fill',
-                    color: 'rgba(40,0,113,0.8)'
+                    color: 'rgba(245,42,69,0.8)'
                   },        
                 ]
               }
