@@ -4,3 +4,13 @@ div#map {
     bottom:0; 
     width:100%; 
 }
+
+.jumbotron.my{
+    padding: 2rem 1rem;
+}
+
+#plot {
+    width:1200px; 
+    height:750px;
+    
+}

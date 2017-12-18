@@ -14,8 +14,6 @@ app.set('view engine', 'pug');
 var geoJson
 if (config.is_ready){
   json = helper.readJsonFileSync(path.join(__dirname, config.ready_data_path), 'utf8')
-  
-  
 }
 else{
   json = helper.buildJsonFile(config.default_path,config.state, config.ready_data_path, config.ready_geodata_path)

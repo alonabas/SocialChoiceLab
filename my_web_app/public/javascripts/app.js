@@ -242,7 +242,7 @@ function smartGraphBuilder(){
 
 function renderMap(){
     Plotly.d3.json('/getGeoJsonRep', function(redjson) {
-    Plotly.d3.json('/getDistricts', function(redjson) {
+    // Plotly.d3.json('/getDistricts', function(redjson) {
     Plotly.d3.json('/getGeoJsonDem', function(bluejson) {
         
             Plotly.newPlot("map", [{
@@ -282,6 +282,7 @@ function renderMap(){
             
         });
     });
+// });
 }
 
 function oneMoreRender(){
@@ -315,7 +316,6 @@ function oneMoreRender(){
               mapboxAccessToken: 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ'
             });
               
-            
         });
 }
 
@@ -342,6 +342,149 @@ function otherMapRender(){
             "data": '/getGeoJson'
             })
         });
+}
+function drawCleverGraph() {
+    var htmlElem = document.getElementById('plot');
+    var hoverInfo = document.getElementById('hoverinfo');
+    // TODO: get number of districts automatically
+    var shapes = []
+    for (var i = 1; i<4; i++){
+        shapes.push(defineDistrictData(i))
+    }
+    console.log(jsonData)
+    var trace2 = {
+        x: [-10,-10,-10,-10,10,10,10,10], 
+        y: [-10,-10,10,10,-10,-10,10,10], 
+        z: [-10,10,-10,10,-10,10,-10,10], 
+        opacity: 0.3,
+        color: 'rgb(77,175,74)',
+        type: 'mesh3d',
+        
+    };
+    recalculateCenters()
+    var lines = buildCleverEdges();
+    var trace3 = {
+        x: lines.map(function(entry){return entry.x}), 
+        y: lines.map(function(entry){return entry.y}), 
+        mode: 'lines',
+        hoverinfo: 'none',
+        line: {
+            color: 'rgb(50,50,50)',
+            width: 0.5
+          },
+          size: 6,
+          symbol: 'dot',
+          colorscale: 'Viridis',
+          type: 'scatter',
+    };
+    var trace1 = {
+        x:jsonData.features.map(function(entry){return entry.center.coordinates[0]}), 
+        y: jsonData.features.map(function(entry){return entry.center.coordinates[1]}), 
+        text: jsonData.features.map(function(entry){return entry.properties.NAME10}),
+        rep: jsonData.features.map(function(entry){return entry.properties.rep.votes}),
+        dem: jsonData.features.map(function(entry){return entry.properties.dem.votes}),
+        mode: 'markers',
+        marker: {
+            size: 4,
+            line: {
+                color: jsonData.features.map(function(entry){
+                    if (entry.properties.dem.votes > entry.properties.rep.votes){
+                        return 'rgba(217, 217, 217, 0.14)'
+                    }
+                    else{
+                        return 'rgba(217, 0, 0, 0.14)'
+                    }
+                }),
+                width: 0.5
+            },
+            color: jsonData.features.map(function(entry){
+                if (entry.properties.dem.votes > entry.properties.rep.votes){
+                    return 'rgba(0, 0, 217, 1.0)'
+                }
+                else{
+                    return 'rgba(217, 0, 0, 1.0)'
+                }
+             }),
+            opacity: 0.9},
+        type: 'scatter',
+        hoverinfo: 'text',
+        hoverlabel: {
+            bgcolor: jsonData.features.map(function(entry){
+                if (entry.properties.dem.votes > entry.properties.rep.votes){
+                    return 'rgba(0, 0, 217, 1.0)'
+                }
+                else{
+                    return 'rgba(217, 0, 0, 1.0)'
+                }
+             }),
+        },
+    };
+    var layout = {
+        xaxis: {
+            showspikes: false,
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            title: '',
+            showticklabels: false
+          },
+          yaxis: {
+            showspikes: false,
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            title: '',
+            showticklabels: false
+          },
+        
+    };
+    console.log(layout)
+    Plotly.newPlot(htmlElem, [trace1, trace3], layout, {scrollZoom: true});
+
+}
+
+function buildCleverEdges(){
+    var neightbours = []
+    jsonData.features.forEach(function(entry){
+        var id = entry.properties.entryId;
+        if (entry.properties.neighbours){
+            entry.properties.neighbours.forEach(function(neighbour){
+                    neightbours.push({x:entry.center.coordinates[0], y:entry.center.coordinates[1]})
+                    neightbours.push({x:jsonData.features[neighbour].center.coordinates[0], y:jsonData.features[neighbour].center.coordinates[1]})
+                    neightbours.push({x:null, y:null})
+                
+            })
+        }
+    })
+    return neightbours;
+}
+
+function recalculateCenters(){
+    var stack = [];
+    var curElem = jsonData.features[0];
+    curElem.newCenter = {}
+    curElem.newCenter.coordinates = [0,0];
+    stack.push(curElem);
+    while(stack.length > 0){
+        curElem = stack.pop();
+        curElem.done = true
+        curElem.properties.neighbours.forEach(function(neighbourId){
+            var neighbour = jsonData.features[neighbourId];
+            if (!neighbour.done){
+            var distance = Math.pow(curElem.center.coordinates[0] - neighbour.center.coordinates[0],2) + Math.pow(curElem.center.coordinates[1] - neighbour.center.coordinates[1],2)
+            var angle = (curElem.center.coordinates[0] - neighbour.center.coordinates[0])/(curElem.center.coordinates[1] - neighbour.center.coordinates[1])
+            neighbour.newCenter = {}
+            neighbour.newCenter.coordinates = [curElem.newCenter.coordinates[0] + 5*Math.cos(angle),curElem.newCenter.coordinates[1] + 5*Math.sin(angle)]
+            stack.push(neighbour)
+            }
+        })
+    }
 }
 
 

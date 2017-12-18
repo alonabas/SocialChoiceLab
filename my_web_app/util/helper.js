@@ -193,7 +193,6 @@ function buildJsonFile(folder, state, outputFile, fullOutputFile){
         if(err) {
             return console.log(err);
         }
-        console.log(data)
     });
     return jsonFinal
 }

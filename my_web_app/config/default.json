@@ -1,7 +1,7 @@
 {
     "state": "New Mexico",
     "default_path": "./../states/",
-    "is_ready": false,
+    "is_ready": true,
     "ready_data_path": "./../states/New Mexico/result.json",
     "ready_geodata_path": "./../states/New Mexico/resultgeo.json"
 }
