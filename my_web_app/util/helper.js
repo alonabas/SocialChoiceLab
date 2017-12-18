@@ -144,12 +144,11 @@ function mergeFiles(dataFile,geoJsonFile, fullOutputFile){
     }
 
     var geojsonData = JSON.stringify(geoJsonFile);
-    fs.writeFile(fullOutputFile, geojsonData, function(err) {
+    fs.writeFileSync(fullOutputFile, geojsonData, function(err) {
         if(err) {
             return console.log(err);
         }
     });
-
     var count = 0
     for (var i = 0; i < geoJsonFile.features.length; i++){
         for (var j = parseInt(i)+1; j< geoJsonFile.features.length; j++){
@@ -194,6 +193,7 @@ function buildJsonFile(folder, state, outputFile, fullOutputFile){
         if(err) {
             return console.log(err);
         }
+        console.log(data)
     });
     return jsonFinal
 }
