@@ -1,20 +1,21 @@
-var jsonData;
-var geoJsonData;
-var randomCube;
+// var jsonData;
+// var geoJsonData;
+// var randomCube;
 
-function getJson(callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'getJson', true);
-    xhr.responseType = 'json';
-    xhr.onload = function () {
-        var status = xhr.status;
-        if (status === 200) {
-            jsonData = xhr.response
-            $('#show_graph').removeClass('disabled');
-        }
-    };
-    xhr.send();
-};
+// //in main
+// function getJson(callback) {
+//     var xhr = new XMLHttpRequest();
+//     xhr.open('GET', 'getJson', true);
+//     xhr.responseType = 'json';
+//     xhr.onload = function () {
+//         var status = xhr.status;
+//         if (status === 200) {
+//             jsonData = xhr.response
+//             $('#show_graph').removeClass('disabled');
+//         }
+//     };
+//     xhr.send();
+// };
 
 
 function getGeoJson(callback) {
@@ -319,30 +320,44 @@ function oneMoreRender(){
         });
 }
 
-function otherMapRender(){
-    /*console.log(geoJsonData)
-    var temp = geoJsonData.features.filter(function(entry){
-        return entry.properties.uscong_dis == 1;
-    })
-    var allTemp = {};
-    allTemp.type = "FeatureCollection"
-    allTemp.features = temp
-    */
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ';
-    var map = new mapboxgl.Map({
-        container: "map",
-        style: "mapbox://styles/mapbox/outdoors-v9",
-        center: [-106, 34],
-        zoom: 4
-    });
+// in Main
+// function otherMapRender(){
+//     /*console.log(geoJsonData)
+//     var temp = geoJsonData.features.filter(function(entry){
+//         return entry.properties.uscong_dis == 1;
+//     })
+//     var allTemp = {};
+//     allTemp.type = "FeatureCollection"
+//     allTemp.features = temp
+//     */
+//     mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ';
+//     var map = new mapboxgl.Map({
+//         container: "map",
+//         style: "mapbox://styles/mapbox/outdoors-v9",
+//         center: [-106, 34],
+//         zoom: 4
+//     });
     
-    map.on("load", function() {
-        map.addSource("national-park", {
-            "type": "geojson",
-            "data": '/getGeoJson'
-            })
-        });
-}
+//     map.on('data', function() {
+//         map.addSource("national-park", {
+//             "type": "geojson",
+//             "data": '/getGeoJsonRep'
+//             })
+        
+//         map.addLayer({
+//             'id': 'maine',
+//             'type': 'fill',
+//             'source': 'national-park',
+            
+//             'layout': {},
+//             'paint': {
+//                 'fill-color': '#088',
+//                 'fill-opacity': 0.8
+//             }
+//         });
+//     });
+
+// }
 function drawCleverGraph() {
     var htmlElem = document.getElementById('plot');
     var hoverInfo = document.getElementById('hoverinfo');
@@ -488,4 +503,276 @@ function recalculateCenters(){
 }
 
 
+function buildGraph(){
+    $('#map').css('display','none');
+    $('#vis-network').css('display','block');
+    var nodes = new vis.DataSet(jsonData.features.map(function(entry){
+        var isRep  = 0;
+        if (!entry.properties.dem.votes) isRep = 1;
+        else if (entry.properties.rep.votes && entry.properties.rep.votes>entry.properties.dem.votes) isRep = 1;
+        return {id:parseInt(entry.properties.entryId), label: entry.properties.NAME10, group: parseInt(entry.properties.uscong_dis+''+isRep)}
+    }));
+
+    var edges = [];
+    jsonData.features.forEach(function(feature){
+        var neighbours = feature.properties.neighbours.forEach(function(neighbour){
+            if (feature.properties.entryId < jsonData.features[neighbour].properties.entryId){
+                edges.push({from:parseInt(feature.properties.entryId), to:parseInt(jsonData.features[neighbour].properties.entryId)})
+            }
+        })
+
+    })
+    edges = new vis.DataSet(edges)
+    console.log(nodes)
+    console.log(edges)
+    var container = document.getElementById('vis-network');
+    // provide the data in the vis format
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        layout: {
+            improvedLayout:false
+        },
+        nodes: {
+            shape: 'dot',
+            size: 20,
+            font: {
+                size: 15,
+                color: '#ffffff'
+            },
+            borderWidth: 2
+        },
+        edges: {
+            width: 2
+        },
+        groups: {
+            10: {
+                color: {background:'red',border:'white'},
+                shape: 'diamond'
+            },
+            20: {
+                color: {background:'red',border:'white'},
+                shape: 'dot'
+            },
+            30: {
+                color: {background:'red',border:'white'},
+                shape: 'star'
+            },
+
+            11: {
+                color: {background:'blue',border:'white'},
+                shape: 'diamond'
+            },
+            21: {
+                color: {background:'blue',border:'white'},
+                shape: 'dot'
+            },
+            31: {
+                color: {background:'blue',border:'white'},
+                shape: 'star'
+            },
+            mints: {color:'rgb(0,255,140)'},
+            source: {
+                color:{border:'white'}
+            }
+        }
+    };
+
+    // initialize your network!
+    var network = new vis.Network(container, data, options);
+}
+
+function buildGraph1(){
+    $('#map').css('display','none');
+    $('#vis-network').css('display','block');
+
+    var G = new jsnx.Graph();
+    var nodesRep = jsonData.features.filter(function(entry){
+        return (entry.properties.rep || !entry.properties.dem) && entry.properties.rep.votes > entry.properties.dem.votes
+    }).map(function(entry){
+        return entry.properties.entryId
+    })
+    nodesRep.color = '#FF5733';
+    G.addNodesFrom(nodesRep,{color:'#FF5733'});
+
+    var nodesDem = jsonData.features.filter(function(entry){
+        return (entry.properties.dem || !entry.properties.rep) && entry.properties.rep.votes <= entry.properties.dem.votes
+    }).map(function(entry){
+        return entry.properties.entryId
+    })
+    nodesDem.color = '#336EFF';
+    G.addNodesFrom(nodesDem, {color:'#336EFF'});
+
+
+    var edges = [];
+    jsonData.features.forEach(function(feature){
+        var neighbours = feature.properties.neighbours.forEach(function(neighbour){
+            if (feature.properties.entryId < jsonData.features[neighbour].properties.entryId){
+                G.addEdge(feature.properties.entryId,jsonData.features[neighbour].properties.entryId)
+            }
+        })
+
+    })
+    jsnx.draw(G, {
+        element: '#vis-network', 
+        withLabels: true, 
+        nodeStyle: {
+            fill: function(d) { 
+                return d.data.color; 
+            }
+        }, 
+        labelStyle: {fill: 'white'},
+        stickyDrag: true
+    });
+
+    // initialize your network!
+}
+
+// in main
+// function calulateDistrictWinners(){
+//     var table = $('<table>',{class:'table'})
+//     var numberDistricts = 3;
+//     var trHead = $('<tr>');
+//     trHead.append($('<th>',{scope:'row',html:'District'}))
+//     trHead.append($('<th>',{scope:'row',html:'Republican votes'}))
+//     trHead.append($('<th>',{scope:'row',html:'Democrate votes'}))
+//     trHead.append($('<th>',{scope:'row',html:'Total votes'}))
+//     var thead = $('<thead>')
+//     thead.append(trHead)
+//     table.append(thead)
+//     for(var i = 1; i<numberDistricts + 1 ;i++){
+//         var result = getWinnerForDistrict(i);
+//         var color = result.rep<result.dem ? 'bg-primary' : 'bg-danger'
+//         var tr = $('<tr>',{class:color});
+//         var td = $('<td>')
+//         td.append(i)
+//         tr.append(td);
+//         td = $('<td>')
+//         td.append(result.rep)
+//         tr.append(td);
+//         td = $('<td>')
+//         td.append(result.dem)
+//         tr.append(td);
+//         td = $('<td>')
+//         td.append(result.total)
+//         tr.append(td);
+//         table.append(tr)
+//     }
+//     $('#result').append(table)
+// }
+
+// function getWinnerForDistrict(district){
+//     return jsonData.features.filter(function(entry){
+//         return entry.properties.uscong_dis == district
+//     }).map(function(entry){
+//         return {dem:entry.properties.dem.votes || 0, rep:entry.properties.rep.votes || 0, total:entry.properties.total}
+//     }).reduce(function(e1,e2){
+//         return {dem:e1.dem+e2.dem, rep:e1.rep+e2.rep, total:e1.total+e2.total};
+
+//     }, {dem:0,rep:0, total:0})
+
+// }
+
+function testVis(){
+
+    
+    var nodes = [
+        {id: 0, label: "0", group: 'source'},
+        {id: 1, label: "1", group: 'icons'},
+        {id: 2, label: "2", group: 'icons'},
+        {id: 3, label: "3", group: 'icons'},
+        {id: 4, label: "4", group: 'icons'},
+        {id: 5, label: "5", group: 'icons'},
+        {id: 6, label: "6", group: 'icons'},
+        {id: 7, label: "7", group: 'icons'},
+        {id: 8, label: "8", group: 'icons'},
+        {id: 9, label: "9", group: 'icons'},
+        {id: 10, label: "10", group: 'mints'},
+        {id: 11, label: "11", group: 'mints'},
+        {id: 12, label: "12", group: 'mints'},
+        {id: 13, label: "13", group: 'mints'},
+        {id: 14, label: "14", group: 'mints'},
+        {id: 15, group: 'dotsWithLabel'},
+        {id: 16, group: 'dotsWithLabel'},
+        {id: 17, group: 'dotsWithLabel'},
+        {id: 18, group: 'dotsWithLabel'},
+        {id: 19, group: 'dotsWithLabel'},
+        {id: 20, label: "diamonds", group: 'diamonds'},
+        {id: 21, label: "diamonds", group: 'diamonds'},
+        {id: 22, label: "diamonds", group: 'diamonds'},
+        {id: 23, label: "diamonds", group: 'diamonds'},
+    ];
+    var edges = [
+        {from: 1, to: 0},
+        {from: 2, to: 0},
+        {from: 4, to: 3},
+        {from: 5, to: 4},
+        {from: 4, to: 0},
+        {from: 7, to: 6},
+        {from: 8, to: 7},
+        {from: 7, to: 0},
+        {from: 10, to: 9},
+        {from: 11, to: 10},
+        {from: 10, to: 4},
+        {from: 13, to: 12},
+        {from: 14, to: 13},
+        {from: 13, to: 0},
+        {from: 16, to: 15},
+        {from: 17, to: 15},
+        {from: 15, to: 10},
+        {from: 19, to: 18},
+        {from: 20, to: 19},
+        {from: 19, to: 4},
+        {from: 22, to: 21},
+        {from: 23, to: 22},
+        {from: 23, to: 0},
+    ]
+    // create a network
+    var container = document.getElementById('vis-network');
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        nodes: {
+            shape: 'dot',
+            size: 20,
+            font: {
+                size: 15,
+                color: '#ffffff'
+            },
+            borderWidth: 2
+        },
+        edges: {
+            width: 2
+        },
+        groups: {
+            diamonds: {
+                color: {background:'red',border:'white'},
+                shape: 'diamond'
+            },
+            dotsWithLabel: {
+                label: "I'm a dot!",
+                shape: 'dot',
+                color: 'cyan'
+            },
+            mints: {color:'rgb(0,255,140)'},
+            icons: {
+                shape: 'icon',
+                icon: {
+                    face: 'FontAwesome',
+                    code: '\uf0c0',
+                    size: 50,
+                    color: 'orange'
+                }
+            },
+            source: {
+                color:{border:'white'}
+            }
+        }
+    };
+    var network = new vis.Network(container, data, options);
+}
 buildCubeForData();

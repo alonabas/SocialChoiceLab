@@ -10,20 +10,29 @@ html
     script(src='https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js')
     script(src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js')
+    script(src="/node_modules/vis/dist/vis.js")
+    script(src="http://d3js.org/d3.v3.min.js")
+    script(src="/public/javascripts/jsnetworkx.js")
     link(href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css', rel='stylesheet')
 
+    link(href="/node_modules/vis/dist/vis.css" rel='stylesheet')
     script(src='/public/javascripts/app.js')
-
+    script(src='/public/javascripts/main_app.js')
   body
     div.container
       div.jumbotron.my
         h1=state
+        button(type='button' id="run_alg" class='btn btn-primary m-1 btn-sm' onclick='runAlgorithm()') Run Algorithm at server
+        br
         button(type='button' id="request_data" class='btn btn-primary m-1 btn-sm' onclick='getJson()') Get Json File
-        button(id='show_graph' type='button' class='btn btn-primary disabled m-1 btn-sm' onclick='drawCleverGraph()') Draw Graph
-        button(type='button' id="draw_on_map" class='btn btn-primary m-1 btn-sm' onclick='renderMap()') Draw On Map
+        button(id='show_graph' type='button' class='btn btn-primary disabled m-1 btn-sm' onclick='buildGraph1()') Draw Graph
+        button(type='button' id="draw_on_map" class='btn btn-primary m-1 btn-sm' onclick='otherMapRender()') Draw On Map
+        button(type='button' id="draw_on_map" class='btn btn-primary m-1 btn-sm' onclick='calulateDistrictWinners()') Calculate Results
 
       div.result
-      div#map
+      div#result
+      div#map.full-screen
       div#plot.plotly
-      div#hoverinfo(margin-left="80px")
+      div.vis-network.full-screen#vis-network
+      div#canvas
 
