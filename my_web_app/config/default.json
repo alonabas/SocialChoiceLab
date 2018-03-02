@@ -1,7 +1,12 @@
 {
     "state": "New Mexico",
     "default_path": "./../states/",
-    "is_ready": true,
+    "is_mapping_ready": true,
+    "is_partition_ready": false,
     "ready_data_path": "./../states/New Mexico/result.json",
-    "ready_geodata_path": "./../states/New Mexico/resultgeo.json"
+    "ready_partition_path": "./../states/New Mexico/partitions/",
+    "ready_partition_name": "result",
+    "partition_file_to_use": "0",
+    "ready_geodata_path": "./../states/New Mexico/resultgeo.json",
+    "data_path": "./../states/New Mexico/data.json"
 }

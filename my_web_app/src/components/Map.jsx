@@ -16,6 +16,27 @@ class Map extends React.Component {
 		});
 	}
 
+	updateMapLayers(districts) {
+		let that = this;
+		let i = 0;
+		districts.forEach(function (entry) {
+			if (that.map.getLayer('district' + entry + 'new')) that.map.remove('district' + entry + 'new');
+			that.map.addLayer({
+				'id': 'district' + entry + 'new',
+				'type': 'fill',
+				'source': 'district' + entry + 'new',
+
+				'layout': {
+					'visibility': 'none'
+				},
+				'paint': {
+					'fill-color': colors[i],
+					'fill-opacity': 1.0
+				}
+			});
+			i++;
+		});		
+	}
 	createMapLayers(districts) {
 		let that = this;
 		let i = 0;
@@ -30,23 +51,28 @@ class Map extends React.Component {
 			})
 		})
 		districts.forEach(function (entry) {
+			
 			that.map.addLayer({
-				'id': 'district' + entry + 'new',
+				'id': 'district' + entry +'old',
 				'type': 'fill',
-				'source': 'district' + entry + 'new',
+				'source': 'district' + entry + 'old',
 
-				'layout': {},
+				'layout': {
+					'visibility': 'visible'
+				},
 				'paint': {
 					'fill-color': colors[i],
 					'fill-opacity': 1.0
 				}
 			});
 			that.map.addLayer({
-				'id': 'district' + entry +'old',
+				'id': 'district' + entry + 'new',
 				'type': 'fill',
-				'source': 'district' + entry + 'old',
+				'source': 'district' + entry + 'new',
 
-				'layout': {},
+				'layout': {
+					'visibility': 'none'
+				},
 				'paint': {
 					'fill-color': colors[i],
 					'fill-opacity': 1.0
@@ -55,23 +81,33 @@ class Map extends React.Component {
 			i++;
 		});		
 	}
-
-	applyMapLayer(type) {
+	applyMapLayer(is_initial) {
 		let that = this;
+		var type = 'old';
 		let otherType = 'new';
-		if (type == 'new') otherType = 'old'
+		
+		if (!is_initial) {
+			type = 'new';
+			otherType = 'old';
+		}
 		this.props.districts.forEach(function (entry) {
 			that.map.setLayoutProperty('district' + entry + type, 'visibility', 'visible');
 			that.map.setLayoutProperty('district' + entry + otherType, 'visibility', 'none');
-		});
+		});		
 	}
 
+
 	componentWillReceiveProps(nextProps) {
+		let that = this;
 		if (this.props.districts.length == 0){
 			this.createMapLayers(nextProps.districts)
+			return
 		}
-		if (this.props.resultType != nextProps.resultType){
-			this.applyMapLayer(nextProps.resultType)
+		else if (this.props.is_initial != nextProps.is_initial){
+			this.applyMapLayer(nextProps.is_initial)
+		}
+		if (nextProps.isToUpdate == true){
+			this.updateMapLayers(nextProps.districts)
 		}
 	}
 
@@ -82,21 +118,21 @@ class Map extends React.Component {
 	render() {
 		var style = {
 			height: '400px',
-			width: '600px',
-			margin: 'auto'
+			width: 'calc(100% - 4em)',
+			margin: '1rem'
 		};
-		if (this.props.isHide) {
-			style.height = '0px';
-			style.width = '0px';
-		}
 		return <div style={style} ref={el => this.mapContainer = el} />;
 	}
 }
 
+Map.defaultProps = {
+	isToUpdate: false
+  };
+
 Map.propTypes = {
-	isHide: PropTypes.bool.isRequired,
-	resultType: PropTypes.string,
-	districts: PropTypes.array
+	is_initial: PropTypes.bool,
+	districts: PropTypes.array,
+	isToUpdate: PropTypes.bool
 }
 
 export default Map;
