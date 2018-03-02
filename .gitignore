@@ -2,6 +2,7 @@ my_web_app/node_modules
 my_web_app/package-lock.json
 my_web_app/.DS_Store
 my_web_app/result.json
+my_web_app/dist/
 .DS_Store
 .idea/
 *.pyc
