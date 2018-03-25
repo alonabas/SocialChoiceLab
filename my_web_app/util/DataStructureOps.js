@@ -1,28 +1,39 @@
+var DistrictObj = require('./District');
+var fs = require("fs");
+
 function sum_reduce(e1,e2){
     return e1 + e2;
 }
 
-function getDistrictNames(data, desiredCandidate, fieldName = 'uscong_dis'){
+module.exports.fixDistrict = function(data){
+	data = data.map(function(entry){
+		let data;
+		if (Array.isArray(entry.properties.all) && entry.properties.all.length > 0){
+			data = entry.properties.all[0].district
+		}
+		else{
+			data = entry.properties.all.district
+		}
+		if (data){
+			entry.properties.uscong_dis = data.toString();
+		}
+		else{
+			console.log('No district for precinct '+ entry.properties.name);
+			console.log(entry.properties.all)
+		}
+		entry.properties.new_district = entry.properties.uscong_dis;
+        return entry;
+	});
+	return data;
+}
+
+function getDistrictNames(data, fieldName = 'uscong_dis'){
     // data is geojson.features
     var districts = data.map(function(entry){
         return entry.properties[fieldName]; 
     })
     districts = districts.filter(function(elem, index, self){
         return self.indexOf(elem) == index;
-    })
-    var other = 0;
-    if (desiredCandidate == 0) other = 1;
-    districts.sort(function(district1, district2){
-        var totalInDistrict1 = data.filter(function(entry){
-            return entry.properties[fieldName] == district1;
-        }).map(function(entry){
-            return {total:entry.properties.total, votes:[entry.properties.rep.votes, entry.properties.dem.votes]}
-        }).reduce(function(all, current){
-            all.total += current.total;
-            all.votes[0] += current.votes[0];
-            all.votes[1] += current.votes[1];
-            return all;
-        }, {total:0, votes:[0, 0]})
     })
     return districts;
 }
@@ -94,7 +105,21 @@ function applyEmptyDistrictToData(data){
 
 function copyDistrictToData(data) {
 	data = data.map(function(entry){
-        entry.properties.new_district = parseInt(entry.properties.uscong_dis);
+		let data;
+		if (Array.isArray(entry.properties.all) && entry.properties.all.length > 0){
+			data = entry.properties.all[0].district
+		}
+		else{
+			data = entry.properties.all.district
+		}
+		if (data){
+			entry.properties.uscong_dis = data.toString();
+		}
+		else{
+			console.log('No district')
+			console.log(entry.properties.all)
+		}
+		entry.properties.new_district = entry.properties.uscong_dis;
         return entry;
 	});
 	return data;
@@ -137,15 +162,97 @@ function isBorderPrecinct(precinctId, district, data){
 	return isBorder;
 }
 
-function isWinningFound(districts, desiredCandidate){
+module.exports.isWinningPartitionFound = function(districts, desiredCandidate, numberOfDistrictsToWin){
 	var count = 0;
 	districts.forEach(function(dist){
 		if (dist.isWinner(desiredCandidate)){
 			count ++ 
 		}
 	})
-	if (count*2 > districts.length) return true;
+	if (count >= numberOfDistrictsToWin) return true;
 	else return false;
+}
+
+module.exports.createDistrictsArray = function(data, gap, isAssignInitial, desiredCandidate){
+	var existingDistricts = getDistrictNames(data)
+    var numberOfDistricts = existingDistricts.length
+    var districts = [];
+    existingDistricts.forEach(function(district){
+        var districtTemp = new DistrictObj.District(data, desiredCandidate, true, district, gap, isAssignInitial=isAssignInitial);
+        districts.push(districtTemp);
+	})
+	return districts
+}
+
+module.exports.randomSortWP = function(elements, prob){
+	if (Math.random() < prob) return elements;
+	return elements.sort(function() {
+		return .5 - Math.random();
+	});
+}
+
+module.exports.calculateChangedPrecincts = function(data){
+	var elems = data.filter(function(entry){
+        return entry.properties.uscong_dis != entry.properties.new_district;
+	})
+	return elems;
+}
+
+module.exports.getWinners = function(districts){
+	return districts.filter((district)=>district.isWinner());
+}
+
+module.exports.saveAssignment = function(json, filename){
+	json.features = json.features.map(function(entry, index){
+		entry.properties.uscong_dis = entry.properties.new_district
+	})
+	var foundPartition = JSON.stringify(json);
+	fs.writeFileSync(filename, foundPartition, function(err) {
+		if(err) {
+			return console.log(err);
+		}
+	});
+	console.log('Partition saved to '+ filename);
+}
+
+module.exports.saveToLog = function(logPath, description, districts){
+	let data = districts.map((entry)=>({name:entry.name, votes:entry.votes, precincts: entry.precincts.length}));
+	if (fs.existsSync(logPath)) {
+		fs.readFile(logPath, function (err, data) {
+			var json = JSON.parse(data)
+			var lastId = json.map((entry)=>entry.id);
+			json.push({id:lastId+1, description: description, data:data})
+			fs.writeFileSync(logPath, JSON.stringify(json), function(err){
+				if(err) {
+					return console.log(err);
+				}
+			})
+		})
+	}
+	else{
+		var json = [{id:0, description: description, data:data}]
+		fs.writeFileSync(logPath, JSON.stringify(json), function(err){
+			if(err) {
+				return console.log(err);
+			}
+		})
+	}
+}
+
+module.exports.printDistricts = function(districts, data){
+    districts.forEach(function(district){
+        district.print();
+    })
+}
+
+module.exports.findNewDistrict = function(precinct, data){
+	var precinctObj = data[precinct];
+	var possibleDistrictcs = precinctObj.properties.neighbours.filter(
+		(other)=>data[other].properties.new_district != precinctObj.properties.new_district).map(
+			(entry)=> data[entry].properties.new_district);
+	if (possibleDistrictcs.length == 0) return null;
+	else return possibleDistrictcs[Math.floor(Math.random()*possibleDistrictcs.length)]
+
 }
 
 module.exports.getDistricsWithMinimalPrecincts = getDistricsWithMinimalPrecincts
@@ -157,5 +264,4 @@ module.exports.getVotesInDistrict = getVotesInDistrict
 module.exports.getDistrictNames = getDistrictNames
 module.exports.isAllAssigned = isAllAssigned
 module.exports.applyEmptyDistrictToData = applyEmptyDistrictToData
-module.exports.isWinningFound = isWinningFound
 module.exports.getDistricsWithMinimalVotes = getDistricsWithMinimalVotes

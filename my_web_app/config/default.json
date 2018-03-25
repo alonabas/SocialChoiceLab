@@ -8,5 +8,6 @@
     "ready_partition_name": "result",
     "partition_file_to_use": "0",
     "ready_geodata_path": "./../states/New Mexico/resultgeo.json",
-    "data_path": "./../states/New Mexico/data.json"
+	"data_path": "./../states/New Mexico/data.json",
+	"log_path": "./../states/New Mexico/log.txt"
 }

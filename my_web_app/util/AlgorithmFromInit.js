@@ -1,97 +1,94 @@
 var util = require('./DataStructureOps');
 var DistrictObj = require('./District');
-var metrics = require('./SortMetrics');
 var fs = require("fs");
 var prob = 0.9
-var countOfSame = 300
+var countOfSame = 200
+var isAssignInitial = false;
+var desiredCandidate = 0;
+var maximalNumberOfSteps = 500;
 
+var winningAssignmentStrategyReq = require('./WinningAssignmentStrategy/InititlaWinningAssignmentStrategy')
+var winnerAssignmentStrategy = new winningAssignmentStrategyReq.InititlaWinningAssignmentStrategy();
+
+var bestMetricReq = require('./Metric/DiffPrecinctMetric');
+var metricToUse1 = new metricReq.Metric(gap, desiredCandidate);
+
+
+var sameDistrictMetricReq = require('./Metric/ExistingDistrict');
+var sameDistrictMetric = new sameDistrictMetricReq.Metric(gap, desiredCandidate);
+
+// var bestInSameDistrictMetricReq = require('./Metric/BestPrecinctInExistingDistrict');
+// var bestInSameDistrictMetric = new bestInSameDistrictMetricReq.Metric(gap, desiredCandidate);
+
+
+
+var districSelectorStrategyReq = require('./DistrictSelector/LeastPrecinctsDistrictSelector');
+var districSelectorStrategy = new districSelectorStrategyReq.DistrictSelector(metricToUse, prob);
+
+var initialAssignmentStrategyReq = require('./PartitionInitializerStrategy/NonBreakingAssignmentStrtegy');
+var initialAssignmentStrategy = new initialAssignmentStrategyReq.InitialAssignmentStrategy(prob, count);
+
+var districNormalizerStrategyReq = require('./DistrictNormalizer/SmartDistrictNormalizer');
+var districNormalizerStrategy = new districNormalizerStrategyReq.DistrictNormalizer(prob, 2000);
+
+
+let countOfWinningDistricts;
+let numberOfDistricts;
 
 function initDistricts(data, desiredCandidate){
-    util.applyEmptyDistrictToData(data)
-    var existingDistricts = util.getDistrictNames(data)
-    var numberOfDistricts = existingDistricts.length
-    var countOfWinningDistricts = util.getNumberOfDistrictsToWin(data, existingDistricts, desiredCandidate)
-    var districts = [];
-    var isWinning = true;
-    var count = 0
-    existingDistricts.forEach(function(district){
-        var districtTemp = new DistrictObj.District(isWinning, district, data);
-        districts.push(districtTemp);
-        count ++;
-        if (count >= countOfWinningDistricts) isWinning = false;
-        
-	})
-    // printDistricts(districts,data);
-    return districts;
+	data = util.fixDistrict(data)
+	var districts = util.createDistrictsArray(data, gap, isAssignInitial, desiredCandidate);
+	winnerAssignmentStrategy.assignWinners(districts, desiredCandidate, data, metricToUse1.metricDistrict, numberOfDistrictsToWin)
+	initialPrecinctsAssignment(districts, data);
+	return districts;
+}
+
+function initialPrecinctsAssignment(districts, data){
+	console.log('Initial district assignment')
+	var blocked = false;
+	do{
+		districts.forEach(function(district){
+			var precinct = district.findPrecinctToAdd(sameDistrictMetric.metricPrecinct, prob)
+			if (!precinct) blocked = true;
+		 	else district.addPrecinct(precinct, data)
+	 	});
+	 i++;
+	} while(!initialAssignmentStrategy.isStop(districts, i, desiredCandidate) && !blocked);
+	util.printDistricts(districts,data);
+}
+
+function assignPrecincts(districts, data){
+	console.log('Start: assign precincts')
+	util.printDistricts(districts,data);
+	var finished = util.isAllAssigned(data);
+	while(!finished){
+		var districtToAdd = districSelectorStrategy.select(districts, desiredCandidate);
+		var precinctToAdd = districtToAdd.findPrecinctToAdd(bestInSameDistrictMetric.metricPrecinct, prob)
+		if (typeof precinctToAdd !== "undefined") districtToAdd.addPrecinct(precinctToAdd, data)
+		finished = util.isAllAssigned(data)
+	}
+	util.printDistricts(districts,data);
 }
 
 function greedyAlgorithm(json, desiredCandidate, filename){
-    var data = json.features;
+	var data = JSON.parse(JSON.stringify(json.features));
+	var partititonFound = false;
+	while (partititonFound || i >= maximalNumberOfSteps){
 	var districts = initDistricts(data, desiredCandidate)
-	let i = 0;
-	while(found && i < countOfSame){
-		var found = true;
-        
-   		districts.forEach(function(district){
-			var precinct = district.findPrecinctToAdd(data, metrics.ExistingDistrict, prob, desiredCandidate)
-			district.addPrecinct(precinct, data)
-            // printMissing(data);
-		});
-		i++;
+		assignPrecincts(districts, data)
+
+		var changedPrecincts = util.calculateChangedPrecincts()    
+		console.log('Number of changed precincts: '+elems.length)
+		let winners = util.getWinners(districts).length;
+		partititonFound = winners >=numberOfDistrictsToWin && districNormalizerStrategy.isNormalized(districts, data)
+		if (partititonFound){
+			json.features = data;
+			util.saveAssignment(json, filename)
+			
+		}
 	}
-    // printDistricts(districts,data);
-	var finished = util.isAllAssigned(data)
-	i = 0
-    while(!finished){
-		var districtToAdd = util.getDistricsWithMinimalPrecincts(districts, prob);
-		var precinct = districtToAdd.findPrecinctToAdd(data, metrics.BestPrecinct, prob, desiredCandidate)
-		if (typeof precinct !== "undefined") districtToAdd.addPrecinct(precinct, data)
-			// printMissing(data);
-		finished = util.isAllAssigned(data)
-		// printMissing(data);
-
-		// printDistricts(districts, data);
-		i++
-    }
-    
-    printDistricts(districts,data);
-    var elems = data.filter(function(entry){
-        return entry.properties.uscong_dis != entry.properties.new_district;
-    })
-    console.log('Number of changed precincts '+elems.length)
-    	
-	data.map(function(entry, index){
-		entry.properties.uscong_dis = entry.properties.new_district
-	})
-    json.features = data;
-	var foundPartition = JSON.stringify(json);
-	var winners = 0;
-	var requestedWinners = 0
-	districts.forEach(function(district){
-		if (district.isWinner(desiredCandidate)) winners++;
-		if (district.isWinning) requestedWinners ++;
-	})
-	if (winners >=requestedWinners){
-		console.log('save to file')
-    	fs.writeFileSync(filename, foundPartition, function(err) {
-        	if(err) {
-            	return console.log(err);
-        	}
-    	});
-	}
-	json.features = data;
-    console.log(filename)
-    
-    return {json: json, found:(winners >=requestedWinners)};
-}
-
-
-function printDistricts(districts, data){
-    districts.forEach(function(district){
-        district.print();
-    })
-    printMissing(data);
-
+	return partititonFound;
+	
 }
 
 function printMissing(data){
@@ -101,28 +98,5 @@ function printMissing(data){
     console.log('Missing partition for '+missing.length)
 }
 
-function normalizeDistrictNeighbours(newDistricts, data){
-
-    newDistricts = newDistricts.map(function(entry){
-        entry.neighbours = entry.neighbours.filter(function(neighbour){
-            return data[neighbour].properties.new_district == 'None'
-        })
-        return entry
-    })
-    return newDistricts
-}
-
-function selectDistrict(newDistricts){
-    var sorted = newDistricts.sort(function(e1,e2){
-        return e1.precincts.length - e2.precincts.length
-    })
-    if (Math.random() > prob){
-        return sorted[Math.floor(Math.random()*sorted.length)]
-    }
-    else{
-        return sorted[0]
-    } 
-    
-}
 
 module.exports.greedyAlgorithm = greedyAlgorithm

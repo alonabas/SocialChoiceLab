@@ -93,7 +93,6 @@ function fillDistricts(newDistricts, data, desiredCandidate){
                 precinct = district.neighbours.pop();
             } 
             district.precincts.push(precinct)
-            // console.log('Precinct '+precinct )
             data[precinct].properties.new_district = district.name;
             data[precinct].properties.neighbours.forEach(function(neighbour){
                 if (data[neighbour].properties.new_district == 'None' && district.neighbours.indexOf(neighbour) == -1){

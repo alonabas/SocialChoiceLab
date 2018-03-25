@@ -1,13 +1,7 @@
-function RandomDistrictSelector(getVotesInDistrict){
+function RandomDistrictSelector(metric, prob){
     this.name = 'Random distric selector selects random district'
 
-    this.select = function(data, desiredCandidate){
-        var districts = data.map(function(entry){
-            return entry.properties.uscong_dis; 
-        })
-        districts = districts.filter(function(elem, index, self){
-            return self.indexOf(elem) == index;
-        })
+    this.select = function(districts, desiredCandidate){		
         return districts[Math.floor(Math.random() * districts.length)]
     }
 }

@@ -8,9 +8,10 @@ var app = express();
 var config = require('./config/default');
 
 var helper = require('./util/helper');
-// var alg = require('./util/algorithmBasic');
-// var alg = require('./util/algorithmFromInit');
-var alg = require('./util/algorithmImprovment');
+var factory = require('./util/Factory');
+
+console.log(factory.discription())
+var alg = factory.algorithm();
 
 
 function printCounts(data){
@@ -64,21 +65,32 @@ if (config.is_mapping_ready){
 else{
   json = helper.buildJsonFile(config.default_path,config.state, config.ready_data_path, config.ready_geodata_path)
 }
+json.features = json.features.filter(function(entry){
+	// var temp = geoJson.features.filter(function(e1){
+	// 	return e1.properties.entryId == entry.properties.entryId;
+	// });
+	// if (temp.length == 0) return false
+	if (!entry.properties.neighbours ||entry.properties.neighbours.length == 0) {
+		console.log(entry.properties.NAME10)	
+		return false
+	}
+	return true;
+})
 if (config.is_partition_ready){
   var fileName = config.ready_partition_path+config.ready_partition_name+config.partition_file_to_use+'.json'
   newJson = helper.readJsonFileSync(path.join(__dirname, fileName), 'utf8')
 }
 else{
-	// var found = false;
+	var found = false;
 	var fileName = getFileNameForPartitions();
 	// while(!found){
 	// 	console.log('! found')
-	// 	data = alg.greedyAlgorithm(JSON.parse(JSON.stringify(json)),0, fileName);
-	// 	newJson = data.json
-	// 	console.log('is found' + data.found)
-	// 	found = data.found
+		data = alg.greedyAlgorithm(JSON.parse(JSON.stringify(json)),0, fileName);
+		newJson = data.json
+		console.log('is found' + data.found)
+		found = data.found
 	// }
-	newJson = alg.greedyAlgorithm(JSON.parse(JSON.stringify(json)),0, fileName);
+	// newJson = alg.greedyAlgorithm(JSON.parse(JSON.stringify(json)),0, fileName);
 
 	  
 }
