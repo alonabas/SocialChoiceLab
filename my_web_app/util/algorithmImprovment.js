@@ -18,6 +18,7 @@ var winningAssignmentStrategyReq = factory.winningAssignmentStrategy()
 var districSelectorStrategyReq = factory.districtSelector();
 var districNormalizerStrategyReq = factory.districtNormalizer();
 var initialAssignmentStrategyReq = factory.initialAssignmentStrategy();
+var districtNormalizerGap = factory.districtNormalizerGap();
 
 
 var testMetricReq = require('./TestMetric')
@@ -26,8 +27,8 @@ testMetric.execute();
 
 var metricToUse = new metricReq.Metric(gap, desiredCandidate);
 var winnerAssignmentStrategy = new winningAssignmentStrategyReq.InitialDistrictAssignment(metricToUse, numberOfDistrictsToWin);
-var districSelectorStrategy = new districSelectorStrategyReq.DistrictSelector(metricToUse, prob);
-var districNormalizerStrategy = new districNormalizerStrategyReq.DistrictNormalizer(prob, gap);
+var districSelectorStrategy = new districSelectorStrategyReq.DistrictSelector(metricToUse, prob, gap);
+var districNormalizerStrategy = new districNormalizerStrategyReq.DistrictNormalizer(prob, districtNormalizerGap);
 var initialAssignmentStrategy = new initialAssignmentStrategyReq.InitialAssignmentStrategy();
 
 
@@ -39,9 +40,16 @@ function greedyAlgorithm(json, desiredCandidate, filename){
 	console.log('Number of changed precincts: '+changedPrecincts.length)
 	let winners = util.getWinners(districts).length;
 	if (winners >= numberOfDistrictsToWin){
+		console.log('Check if districts are not broken');
+		console.log('aaa')
+		districts.forEach(function(district){
+			district.isConnectionBroken();
+		})
+
 		json.features = data;
 		util.saveAssignment(json, filename)
 		util.saveToLog(factory.logFile(), factory.discription(), districts);
+		console.log('FiNISH')
 	}
     return winners >=numberOfDistrictsToWin;
 }
@@ -66,9 +74,11 @@ function assignPrecincts(districts, data){
 			districtToAdd.addPrecinct(precinctToAdd);
 			oldDistrictObj.removePrecinct(precinctToAdd)
 		}
+		
 		else{
 			console.log('No precincts to add to district '+districtToAdd.name)
-			console.log(precinctToAdd.potentialToAdd)
+			console.log(precinctToAdd)
+			
 		}
 		finished = util.isWinningPartitionFound(districts, desiredCandidate, numberOfDistrictsToWin)
 		if (finished || i == stepsBeforeNormalization){
@@ -112,7 +122,6 @@ function normalize(districts, data){
 	districNormalizerStrategy.normalize(districts, data, metricToUse.metricPrecinct)
 	console.log('Stop: normalization of districts');
 	util.printDistricts(districts,data);
-
 }
 
 

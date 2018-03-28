@@ -2,12 +2,13 @@
     "state": "New Mexico",
     "default_path": "./../states/",
     "is_mapping_ready": true,
-    "is_partition_ready": false,
+    "is_partition_ready": true,
     "ready_data_path": "./../states/New Mexico/result.json",
     "ready_partition_path": "./../states/New Mexico/partitions/",
     "ready_partition_name": "result",
     "partition_file_to_use": "0",
     "ready_geodata_path": "./../states/New Mexico/resultgeo.json",
 	"data_path": "./../states/New Mexico/data.json",
-	"log_path": "./../states/New Mexico/log.txt"
+	"log_path": "./../states/New Mexico/log.txt",
+	"alg_config_path": "./../config/algorithmConfig/algorithmConfigv1.json"
 }

@@ -1,15 +1,16 @@
 var util = require('../DataStructureOps');
 
-function MinimalVotesDistrictNormalizer(prob = 0.9, allowedGap = 2000){
+function MinimalVotesDistrictNormalizer(prob, allowedGap=2000){
     this.name = 'District Normalizer: Number of votes in each districts should be close (with diff up to'+allowedGap+')';
 	this.prob = prob;
 	this.allowedGap = allowedGap;
+	if (allowedGap < 2000) this.allowedGap = 2000
 	this.isRemovePrecicnts = false;
 	this.isNormalized = function(districts, data){
 		let totalVoices = districts.map(x=>(x.totalVotes)).reduce((xs,x)=>(xs+x),0);
 		let minimalVoicesInDistrict = totalVoices/districts.length - this.allowedGap;
 		districts.sort((e1,e2)=>(e1.totalVotes - e2.totalVotes));
-		return districts[0].totalVotes >= minimalVoicesInDistrict;
+		return districts[0].totalVotes > minimalVoicesInDistrict;
 
 	}
 
@@ -29,7 +30,7 @@ function MinimalVotesDistrictNormalizer(prob = 0.9, allowedGap = 2000){
 			elem = district.totalVotes + gap > required;
 		}
 		if (steps){
-			elem = elem && steps < 200;
+			elem = elem && steps < 50;
 		}
 		return elem;
 	}
@@ -56,11 +57,18 @@ function MinimalVotesDistrictNormalizer(prob = 0.9, allowedGap = 2000){
 		}
 		else{
 			var potentialToRemove = curDistrict.getAllPotentialPrecinctsToRemoveSorted(metric);
-			var precinct;
-			if (Math.random() > this.prob) precinct = potentialToRemove[Math.floor(Math.random()*potentialToRemove.length)]
-			else precinct = potentialToRemove[potentialToRemove.length-1]
+			potentialToRemove.reverse()
+			util.randomSortWP(potentialToRemove, prob)
+			let precinct = potentialToRemove.find(function(entry){
+				var curPrecinct = data[entry];
+				if (!curDistrict.isBreaksConnection(entry)){
+					return true
+				}
+				return false;
+			})
 			var newDistrict = util.findNewDistrict(precinct, data)
 			let newDistrictObj = districts.filter((entry)=>(entry.name == newDistrict));
+			if (!newDistrictObj) return [precinct,newDistrictObj]
 			return [precinct,newDistrictObj[0]]
 		}
 	}
@@ -85,11 +93,13 @@ function MinimalVotesDistrictNormalizer(prob = 0.9, allowedGap = 2000){
 		let i=0
 		let required;
 		while(!found && i<100){
+			console.log('Norm '+i)
 			required = minimalVoicesInDistrict;
 			this.isRemovePrecicnts = false;
-			if(Math.random()>0.0){
+			if(Math.random()>0.1){
 				console.log('Will remove precincts')
 				required = maximalVoicesInDistrict
+				console.log(required)
 				this.isRemovePrecicnts = true;
 			}
 			let curDistrict = this.getDistrict(districts)

@@ -71,7 +71,7 @@ class ResultsTable extends React.Component {
   	}
 }
 
-Map.propTypes = {
+ResultsTable.propTypes = {
 	json: PropTypes.object,
 	districts: PropTypes.array
 }

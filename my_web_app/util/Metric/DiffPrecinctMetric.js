@@ -1,6 +1,7 @@
-function DiffPrecinctMetric(desiredCandidate){
+function DiffPrecinctMetric(gap, desiredCandidate){
     this.name = 'Metric based on difference between votes for desired candidate and undesired candidate'
 	this.desiredCandidate = desiredCandidate;
+	this.gap = gap;
 	
 	this.metricPrecinct = function(district, data){
 		let otherCandidate = (this.desiredCandidate+1)%2;

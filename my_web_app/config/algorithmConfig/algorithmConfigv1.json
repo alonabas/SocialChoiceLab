@@ -26,7 +26,7 @@
 				"_comment": "Recalculate what districts we are going to improve after each round"
 			},
 			"winningGap":{
-				"value": 0,
+				"value": 10000,
 				"_comment": "Minimal difference in number of votes in district for our candidate and for oponent to conclude that our candidate is winning"
 			},
 			"maximalNumberOfSteps":{
@@ -63,7 +63,7 @@
 		"_comment_1": "number of precincts in each district is closed",
 		"params": {
 			"gap": {
-				"value": 20,
+				"value": 2000,
 				"_comment": "Allowed number of precints/votes difference to be more/less than median number"
 			}
 		}
@@ -75,7 +75,7 @@
 		"_comment_1": "1 - assigns precincts until number of district in which our candidate wins gets below of required",
 		"params": {
 			"count":{
-				"value": 0.9,
+				"value": 300,
 				"_comment": "Maximal number precincts to assign"
 			}
 		}

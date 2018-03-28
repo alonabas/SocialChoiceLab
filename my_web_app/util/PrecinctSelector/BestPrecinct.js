@@ -1,4 +1,4 @@
-function BestPrecinctSelector(desiredCandidate, metric, prob){
+function BestPrecinctSelector(desiredCandidate, prob, metric){
     this.name = 'Metric that adds best precinct to its district as is'
 	this.desiredCandidate = desiredCandidate;
 	this.metric = metric;

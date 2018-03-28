@@ -15,6 +15,7 @@ class Header extends React.Component {
 		let buttonInitial = (<Button onClick={this.props.handler} bsStyle="primary" className="ml-1 mr-1">
 								Initial Results
 							</Button>)
+							
 		let buttonNew = (<Button bsStyle="primary" onClick={this.props.handler} className="ml-1 mr-1">
 							New Results
 						</Button>)
@@ -23,14 +24,14 @@ class Header extends React.Component {
 								Initial Results
 							</Button>)
 		}
-		else{
+		if (this.props.selectedResult === this.props.fetchedResult){
 			buttonNew = (<Button bsStyle="primary" className="ml-1 mr-1" disabled>
-							New Results
+							Get Results
 						</Button>)
-		}
+		}	
 
     	return (
-        	<div className="jumbotron">
+        	<div className="jumbotron fixed-top">
             	<h1 className="text-center">
                 	{this.props.title}
             	</h1>
@@ -48,9 +49,6 @@ class Header extends React.Component {
                 	</Button>
                 	<Button bsStyle="primary" className="ml-1 mr-1">
                     	Hide All
-                    </Button>
-					<Button bsStyle="primary" className="ml-1 mr-1" onClick={this.props.rerurnAlgHandler}>
-                    	Rerurn algorithm
                     </Button>
                 </ButtonToolbar>
 				{this.state.showAdditional &&
@@ -73,9 +71,10 @@ class Header extends React.Component {
 Header.propTypes = {
 	is_initial: PropTypes.bool,
 	handler: PropTypes.func,
-	rerurnAlgHandler: PropTypes.func,
 	title: PropTypes.string,
-	additional: PropTypes.string
+	additional: PropTypes.string,
+	selectedResult: PropTypes.number,
+	fetchedResult: PropTypes.number
 }
 
 export default Header;

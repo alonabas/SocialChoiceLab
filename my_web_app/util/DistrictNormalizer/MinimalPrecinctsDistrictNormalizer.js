@@ -4,6 +4,8 @@ function MinimalPrecinctsDistrictNormalizer(prob = 0.9, allowedGap = 20){
     this.name = 'District Normalizer: Number of votes in each districts should be close (with diff up to'+allowedGap+')';
 	this.prob = prob;
 	this.allowedGap = allowedGap;
+	if (allowedGap > 20) this.allowedGap = 20
+
 
 	this.isNormalized = function(districts, data){
 		let totalPrecincts = districts.map(x=>(x.precincts.length)).reduce((xs,x)=>(xs+x),0);
@@ -36,6 +38,7 @@ function MinimalPrecinctsDistrictNormalizer(prob = 0.9, allowedGap = 20){
 	this.getPrecinct = function(curDistrict, data, metric, districts){
 		if (!this.isRemovePrecicnts){
 			var potentialToAdd = curDistrict.getAllPotentialPrecinctsSorted(metric);
+			util.randomSortWP(potentialToAdd, prob)
 			var oldDistrictObj;
 			var precintToAdd = potentialToAdd.find(function(entry){
 				var curPrecinct = data[entry];
@@ -55,9 +58,15 @@ function MinimalPrecinctsDistrictNormalizer(prob = 0.9, allowedGap = 20){
 		}
 		else{
 			var potentialToRemove = curDistrict.getAllPotentialPrecinctsToRemoveSorted(metric);
-			var precinct;
-			if (Math.random() > this.prob) precinct = potentialToRemove[Math.floor(Math.random()*potentialToRemove.length)]
-			else precinct = potentialToRemove[potentialToRemove.length-1]
+			potentialToRemove.reverse()
+			util.randomSortWP(potentialToRemove, prob)
+			let precinct = potentialToRemove.find(function(entry){
+				var curPrecinct = data[entry];
+				if (!curDistrict.isBreaksConnection(entry)){
+					return true
+				}
+				return false;
+			})			
 			var newDistrict = util.findNewDistrict(precinct, data)
 			let newDistrictObj = districts.filter((entry)=>(entry.name == newDistrict));
 			return [precinct,newDistrictObj[0]]
@@ -86,7 +95,7 @@ function MinimalPrecinctsDistrictNormalizer(prob = 0.9, allowedGap = 20){
 		while(!found && i<100){
 			required = minimalPrecinctsInDistrict;
 			this.isRemovePrecicnts = false;
-			if(Math.random()>0.0){
+			if(Math.random()>0.1){
 				console.log('Will remove precincts')
 				required = maximalPrecinctsInDistrict
 				this.isRemovePrecicnts = true;

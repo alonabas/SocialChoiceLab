@@ -8,9 +8,13 @@ var app = express();
 var config = require('./config/default');
 
 var helper = require('./util/helper');
+var factory = require('./util/Factory');
+
+
+var alg = factory.algorithm();
 // var alg = require('./util/algorithmBasic');
 // var alg = require('./util/algorithmFromInit');
-var alg = require('./util/algorithmImprovment');
+// var alg = require('./util/algorithmImprovment');
 
 
 function printCounts(data){
@@ -83,7 +87,46 @@ else{
 	  
 }
 
-  
+// fix geojson
+
+json.features.map(function(entry){
+	let temp;
+	if (Array.isArray(entry.properties.all) && entry.properties.all.length > 0){
+		temp = entry.properties.all[0].district
+	}
+	else{
+		temp = entry.properties.all.district
+	}
+	if (temp){
+		entry.properties.uscong_dis = temp.toString();
+	}
+	else{
+		console.log('No district for precinct '+ entry.properties.name);
+		console.log(entry.properties.all)
+	}
+	return temp
+});
+
+geoJson.features.map(function(entry){
+	let temp;
+	if (Array.isArray(entry.properties.all) && entry.properties.all.length > 0){
+		temp = entry.properties.all[0].district
+	}
+	else{
+		temp = entry.properties.all.district
+	}
+	if (temp){
+		entry.properties.uscong_dis = temp.toString();
+	}
+	else{
+		console.log('No district for precinct '+ entry.properties.name);
+		console.log(entry.properties.all)
+	}
+	return temp
+});
+
+
+let logJson = helper.readJsonFileSync(path.join(__dirname, config.log_path), 'utf8')
 
   // geoJson.features.map(function(entry, index){
     // entry.properties.uscong_dis = json.features[index].properties.new_district
@@ -105,21 +148,13 @@ app.get('/', function(req, res) {
 });
 
 app.get('/getJson', function(req, res) {
-	var result = {old: json, new: newJson, title:config.state + ' 2016 Elections'};
+	var id = req.query.id;
+	var result = {old: json, title:config.state + ' 2016 Elections'};
+	if (typeof id !== 'undefined'){
+		let newJson = helper.readJsonFileSync(path.join(__dirname, config.ready_partition_path)+'/result'+id+'.json', 'utf8')
+		result = {new_json: newJson};
+	}
   	res.send(JSON.stringify(result));
-});
-
-var index = 0;
-app.get('/rerunAlg', function(req, res) {
-	var fileName = getFileNameForPartitions();
-	var filePath = path.join(folderReadyPath, config.ready_partition_name + index+'.json')
-	console.log('Get file '+filePath)
-	newJson = helper.readJsonFileSync(filePath, 'utf8')
-	index ++;
-	
-	var result = {old: json, new: newJson, title:config.state + ' 2016 Elections:new alg run'};
-  	res.send(JSON.stringify(result));
-	
 });
 
 app.get('/getGeoJson', function(req, res) {
@@ -146,29 +181,35 @@ app.get('/getGeoJsonDem', function(req, res) {
 
 app.get('/getGeoJsonDistrict', function(req, res) {
   var id = req.query.district
+  var resultId = req.query.resultId;
   var type = req.query.type;
-  if (type == 'new'){
-	geoJson.features.map(function(entry, index){
-		console.log(newJson)
-		entry.properties.uscong_dis = newJson.features[index].properties.uscong_dis
+  if (type == 'new' && resultId != -1){
+	var geoJsonTemp = JSON.parse(JSON.stringify(geoJson))
+	var jsonToUse = helper.readJsonFileSync(path.join(__dirname, config.ready_partition_path)+'/result'+resultId+'.json', 'utf8')
+	geoJsonTemp.features.map(function(entry, index){
+		entry.properties.uscong_dis = jsonToUse.features[index].properties.uscong_dis
+		return entry;
 	})
   }
   else{
-	geoJson.features.map(function(entry, index){
-		entry.properties.uscong_dis = json.features[index].properties.uscong_dis
-	})
+	var geoJsonTemp = JSON.parse(JSON.stringify(geoJson))
   }
-  var distFeatures = geoJson.features.filter(function(entry){
+  
+  var distFeatures = geoJsonTemp.features.filter(function(entry){
     return entry.properties.uscong_dis == id;
   })
   console.log(distFeatures.length)
   res.send(JSON.stringify({type:'FeatureCollection', 'features':distFeatures}));
 });
 
-app.get('/getALgResult', function(req, res) {
-  res.send(JSON.stringify(json));
-});
+app.get('/getListOfResults', function(req, res){
+	res.send(JSON.stringify(logJson))
+})
+
+// app.get('/getResult', function(req, res) {
+	
+// });
 
 
 console.log('starting') 
-app.listen(3000);
+app.listen(3001);

@@ -205,6 +205,7 @@ module.exports.getWinners = function(districts){
 module.exports.saveAssignment = function(json, filename){
 	json.features = json.features.map(function(entry, index){
 		entry.properties.uscong_dis = entry.properties.new_district
+		return entry;
 	})
 	var foundPartition = JSON.stringify(json);
 	fs.writeFileSync(filename, foundPartition, function(err) {
@@ -217,11 +218,17 @@ module.exports.saveAssignment = function(json, filename){
 
 module.exports.saveToLog = function(logPath, description, districts){
 	let data = districts.map((entry)=>({name:entry.name, votes:entry.votes, precincts: entry.precincts.length}));
+	console.log(logPath)
 	if (fs.existsSync(logPath)) {
 		fs.readFile(logPath, function (err, data) {
+			if (err){
+				console.log(err)
+			}
 			var json = JSON.parse(data)
 			var lastId = json.map((entry)=>entry.id);
-			json.push({id:lastId+1, description: description, data:data})
+			if (lastId.length > 0) lastId=Number(lastId[lastId.length-1]);
+			else lastId = 0;
+			json.push({id:lastId+1, description: description})
 			fs.writeFileSync(logPath, JSON.stringify(json), function(err){
 				if(err) {
 					return console.log(err);

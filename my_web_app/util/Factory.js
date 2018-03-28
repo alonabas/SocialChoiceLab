@@ -1,5 +1,7 @@
-var algorithmConfig = require('../config/algorithmConfig');
 var config = require('../config/default')
+var algConfigPath = config.alg_config_path;
+var algorithmConfig = require(algConfigPath);
+
 
 module.exports.algorithm = function(){
 	var algorithmRequire;
@@ -54,8 +56,8 @@ module.exports.metric = function(){
 
 module.exports.precintSelector = function(){
 	var precintSelector;
-	if (algorithmConfig.precint_selector.value == 0) precintSelector = require('./PrecintSelector/BestPrecinct.js')
-	else if (algorithmConfig.precint_selector.value == 1) precintSelector = require('./PrecintSelector/BestPrecinctInExistingDistrict.js')
+	if (algorithmConfig.precint_selector.value == 0) precintSelector = require('./PrecinctSelector/BestPrecinct.js')
+	else if (algorithmConfig.precint_selector.value == 1) precintSelector = require('./PrecinctSelector/BestPrecinctInExistingDistrict.js')
 	return precintSelector;
 }
 

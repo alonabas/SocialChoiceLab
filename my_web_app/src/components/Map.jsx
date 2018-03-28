@@ -6,6 +6,10 @@ const colors = ['#ADFF2F', '#00FFFF', '#FF00FF', '#00CED1', '#4B0082', '#00FF00'
 
 class Map extends React.Component {
 
+	constructor(props, context){
+		super(props, context);
+		this.state = ({appliedLayer:''})
+	}
 	componentDidMount() {
 		mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ';
 		this.map = new mapboxgl.Map({
@@ -16,98 +20,73 @@ class Map extends React.Component {
 		});
 	}
 
-	updateMapLayers(districts) {
-		let that = this;
-		let i = 0;
-		districts.forEach(function (entry) {
-			if (that.map.getLayer('district' + entry + 'new')) that.map.remove('district' + entry + 'new');
-			that.map.addLayer({
-				'id': 'district' + entry + 'new',
-				'type': 'fill',
-				'source': 'district' + entry + 'new',
 
-				'layout': {
-					'visibility': 'none'
-				},
-				'paint': {
-					'fill-color': colors[i],
-					'fill-opacity': 1.0
-				}
-			});
-			i++;
-		});		
-	}
-	createMapLayers(districts) {
+
+	tryCreateInitialLayers(districts, resultId){
 		let that = this;
 		let i = 0;
+		let name = 'new-'+resultId;
+		let query = '&type=new&resultId='+resultId
+		if (resultId == -1) {
+			name = 'old'
+			query = '&type=old'
+		}
 		districts.forEach(function (entry) {
-			that.map.addSource("district" + entry + 'new', {
-				"type": "geojson",
-				"data": '/getGeoJsonDistrict?district=' + entry + '&type=new'
-			}),
-			that.map.addSource("district" + entry + 'old', {
-				"type": "geojson",
-				"data": '/getGeoJsonDistrict?district=' + entry + '&type=old'
-			})
+			if (!that.map.getLayer("district" + entry + name)) {
+				that.map.addSource("district" + entry + name, {
+					"type": "geojson",
+					"data": '/getGeoJsonDistrict?district=' + entry + query
+				})
+			}
 		})
 		districts.forEach(function (entry) {
-			
-			that.map.addLayer({
-				'id': 'district' + entry +'old',
-				'type': 'fill',
-				'source': 'district' + entry + 'old',
+			if (!that.map.getLayer("district" + entry + name)) {
+				that.map.addLayer({
+					'id': 'district' + entry + name,
+					'type': 'fill',
+					'source': 'district' + entry + name,
 
-				'layout': {
-					'visibility': 'visible'
-				},
-				'paint': {
-					'fill-color': colors[i],
-					'fill-opacity': 1.0
-				}
-			});
-			that.map.addLayer({
-				'id': 'district' + entry + 'new',
-				'type': 'fill',
-				'source': 'district' + entry + 'new',
-
-				'layout': {
-					'visibility': 'none'
-				},
-				'paint': {
-					'fill-color': colors[i],
-					'fill-opacity': 1.0
-				}
-			});
-			i++;
+					'layout': {
+						'visibility': 'none'
+					},
+					'paint': {
+						'fill-color': colors[i],
+						'fill-opacity': 1.0
+					}
+				});
+				i++;
+			}
 		});		
 	}
-	applyMapLayer(is_initial) {
-		let that = this;
-		var type = 'old';
-		let otherType = 'new';
-		
-		if (!is_initial) {
-			type = 'new';
-			otherType = 'old';
+	applyMapLayer(districts, resultId) {
+		let name = 'new-'+resultId;
+		if (resultId == -1){
+			name = 'old'
 		}
-		this.props.districts.forEach(function (entry) {
-			that.map.setLayoutProperty('district' + entry + type, 'visibility', 'visible');
-			that.map.setLayoutProperty('district' + entry + otherType, 'visibility', 'none');
+		var that = this;
+		districts.forEach(function (entry) {
+			if (that.map.getLayer("district" + entry + that.state.appliedLayer)) {
+				that.map.setLayoutProperty('district' + entry + that.state.appliedLayer, 'visibility', 'none');
+			}
+			that.map.setLayoutProperty('district' + entry + name, 'visibility', 'visible');
+			that.setState({appliedLayer:name})
+			// 
 		});		
 	}
 
 
 	componentWillReceiveProps(nextProps) {
 		let that = this;
-		if (this.props.districts.length == 0){
-			this.createMapLayers(nextProps.districts)
-			return
+		if (JSON.stringify(nextProps) == JSON.stringify(this.props)) return;
+		if (nextProps.isToUpdate == true && nextProps.is_initial){
+			this.tryCreateInitialLayers(nextProps.districts, -1)
+			this.applyMapLayer(nextProps.districts,-1);
+			return;
 		}
-		else if (this.props.is_initial != nextProps.is_initial){
-			this.applyMapLayer(nextProps.is_initial)
-		}
-		if (nextProps.isToUpdate == true){
-			this.updateMapLayers(nextProps.districts)
+		else if( nextProps.isToUpdate == true && nextProps.resultId > -1){
+			this.tryCreateInitialLayers(nextProps.districts, nextProps.resultId)
+			this.applyMapLayer(nextProps.districts,nextProps.resultId);
+			return;
 		}
 	}
 
@@ -132,7 +111,8 @@ Map.defaultProps = {
 Map.propTypes = {
 	is_initial: PropTypes.bool,
 	districts: PropTypes.array,
-	isToUpdate: PropTypes.bool
+	isToUpdate: PropTypes.bool,
+	resultId: PropTypes.number
 }
 
 export default Map;
