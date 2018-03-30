@@ -114,9 +114,11 @@ class App extends React.Component {
             <div>
                 <Header title={this.state.title} is_initial={this.state.is_initial} handler={this.updateState.bind(this)} additional={this.state.changedPrecints}
 					selectedResult={this.state.selectedResultId} fetchedResult={this.state.fetchedResultId}/>
+				<span style={{top:'240px', position:'relative'}}>
 				<ResultsList data={this.state.list_runs} passToButton={this.updateSelectedResult.bind(this)}/>
                 <Map is_initial={this.state.is_initial} districts={this.state.districts} isToUpdate={this.state.isToUpdate} resultId={this.state.fetchedResultId}/>
                 <ResultsTable districts={this.state.districts} json={json}/>
+				</span>
             </div>
         );
     }
