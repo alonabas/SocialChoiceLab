@@ -15,13 +15,21 @@ class ResultsList extends React.Component {
 		this.props.passToButton(Number(event.target.value))
 	}
 
-	toggleDescription(index){
-		console.log('toggle')
+	openFullDescription(index){
 		let state = this.state;
-		var oldVal = state.openStatus[index];
-		if (!oldVal) state.openStatus.map((entry)=>false);
-		state.openStatus[index] = !oldVal;
+		state.openStatus.map((entry)=>(entry.open=false));
+		state.openStatus[index].open = true;
 		this.setState(state);
+	}
+
+	componentDidMount(){
+		if (this.props.data.length > 0){
+			let state = this.state 
+			this.props.data.forEach(function(e){
+				state.openStatus.push({data:e, open:false});
+			});
+			this.setState(state);
+		}
 	}
 
 	componentWillReceiveProps(nextProps){
@@ -29,7 +37,7 @@ class ResultsList extends React.Component {
 			if (nextProps.data.length > 0){
 				let state = this.state 
 				nextProps.data.forEach(function(e){
-					state.openStatus.push(false);
+					state.openStatus.push({data:e, open:false});
 				});
 				this.setState(state);
 			}
@@ -37,24 +45,23 @@ class ResultsList extends React.Component {
 	}
 	  
 	getLi(elem, index){
-		console.log(this.state.selectedOption)
-		let description = elem.description;
+		let description = elem.data.description;
 		let descHtml = (<span>{description}</span>)
-		if (!this.state.openStatus[elem.id]){
+		if (!elem.open){
 			description = description.slice(0, Math.min(50, description.length))
 			descHtml = (<span>
 							{description}
-							<a tabIndex={0} onClick={this.toggleDescription.bind(this, elem.id)}>...</a>
+							<a tabIndex={0} onClick={this.openFullDescription.bind(this, elem.data.id)}>...</a>
 						</span>)
 		}
 		return (
-			<div key={elem.id}>
-				<div className="row">
+			<div key={elem.data.id}>
+				<div className="row border-bottom">
 					<div className="col-2 border-left">
-            			<input type="radio" value={elem.id} checked={this.state.selectedOption === Number(elem.id)} 
+            			<input type="radio" value={elem.data.id} checked={this.state.selectedOption === Number(elem.data.id)} 
 						 onChange={this.handleOptionChange.bind(this)}/>
           			</div>
-					<div className="col-2 border-left">{elem.id}</div>
+					<div className="col-2 border-left">{elem.data.id}</div>
 					<div className="col-8 border-left border-right">{descHtml}</div>
 				</div>
 			</div>
@@ -63,8 +70,7 @@ class ResultsList extends React.Component {
 
 	render () {
 		var that = this;
-		console.log(this.props.data)
-		let lis = this.props.data.map((elem, index)=>that.getLi(elem, index))
+		let lis = this.state.openStatus.map((elem, index)=>that.getLi(elem, index))
 		return (
     		<div className='grid px-5' style={{position:'relative', overflow:'auto', height:'auto'}}>
         		{lis}
