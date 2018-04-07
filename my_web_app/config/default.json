@@ -2,7 +2,7 @@
     "state": "New Mexico",
     "default_path": "./../states/",
     "is_mapping_ready": true,
-    "is_partition_ready": true,
+    "is_partition_ready": false,
     "ready_data_path": "./../states/New Mexico/result.json",
     "ready_partition_path": "./../states/New Mexico/partitions/",
     "ready_partition_name": "result",

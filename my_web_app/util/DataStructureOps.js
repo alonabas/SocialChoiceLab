@@ -1,5 +1,6 @@
 var DistrictObj = require('./District');
 var fs = require("fs");
+var path = require("path");
 
 function sum_reduce(e1,e2){
     return e1 + e2;
@@ -218,8 +219,11 @@ module.exports.saveAssignment = function(json, filename){
 
 module.exports.saveToLog = function(logPath, description, districts){
 	let data = districts.map((entry)=>({name:entry.name, votes:entry.votes, precincts: entry.precincts.length}));
+	// logPath = path.join(__dirname, logPath)
 	console.log(logPath)
+	
 	if (fs.existsSync(logPath)) {
+		console.log('File exists')
 		fs.readFile(logPath, function (err, data) {
 			if (err){
 				console.log(err)
@@ -237,6 +241,7 @@ module.exports.saveToLog = function(logPath, description, districts){
 		})
 	}
 	else{
+		console.log('File doesnt exists')
 		var json = [{id:0, description: description, data:data}]
 		fs.writeFileSync(logPath, JSON.stringify(json), function(err){
 			if(err) {

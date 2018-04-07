@@ -6,7 +6,7 @@
 		"_comment_1": "(1) - algorithm that takes partial partition of precincts and assigns the others based on some metric",
 		"params": {
 			"prob":{
-				"value": 0.9,
+				"value": 0.7,
 				"_comment": "Probability, exploration/exploitation factor"
 			},
 			"desiredCandidate": {
@@ -26,7 +26,7 @@
 				"_comment": "Recalculate what districts we are going to improve after each round"
 			},
 			"winningGap":{
-				"value": 10000,
+				"value": 7000,
 				"_comment": "Minimal difference in number of votes in district for our candidate and for oponent to conclude that our candidate is winning"
 			},
 			"maximalNumberOfSteps":{
@@ -37,7 +37,7 @@
 		}
 	},
 	"district_selection_strategy":{
-		"value":1,
+		"value":2,
 		"_comment": "District selection strategy, the way algorithm will select the district at each step to add precincts to",
 		"_comment_0": "0-select district with maximal quality accordiing to provided metric in which our candidate loses",
 		"_comment_1": "1-select district with minimal number of votes",
@@ -69,7 +69,7 @@
 		}
 	},
 	"initial_assignment_strategy": {
-		"value":0,
+		"value":1,
 		"_comment": "Initial precinct assignment strategy, used only for algorithm type 1",
 		"_comment_0": "0 - assigns some constant number of precincts to their districts",
 		"_comment_1": "1 - assigns precincts until number of district in which our candidate wins gets below of required",

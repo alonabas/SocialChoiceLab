@@ -12,24 +12,13 @@ class Header extends React.Component {
 	}
 
   	render () {
-		let buttonInitial = (<Button onClick={this.props.handler} bsStyle="primary" className="ml-1 mr-1">
+		let buttonInitial = (<Button bsStyle="primary" onClick={this.props.handler} className="ml-1 mr-1" data-elem='initial' disabled={this.props.is_initial}>
 								Initial Results
 							</Button>)
 							
-		let buttonNew = (<Button bsStyle="primary" onClick={this.props.handler} className="ml-1 mr-1">
-							New Results
-						</Button>)
-		if (this.props.is_initial){
-			buttonInitial = (<Button bsStyle="primary" className="ml-1 mr-1" disabled>
-								Initial Results
-							</Button>)
-		}
-		if (this.props.selectedResult === this.props.fetchedResult){
-			buttonNew = (<Button bsStyle="primary" className="ml-1 mr-1" disabled>
+		let buttonNew = (<Button bsStyle="primary" onClick={this.props.handler} className="ml-1 mr-1" disabled={!this.props.is_initial && this.props.selectedResult === this.props.fetchedResult}>
 							Get Results
 						</Button>)
-		}	
-
     	return (
         	<div className="jumbotron fixed-top">
             	<h1 className="text-center">
@@ -38,7 +27,7 @@ class Header extends React.Component {
             	<ButtonToolbar className='center-button-toolbar pt-3'>	
 					{buttonInitial}
 					{buttonNew}
-                	<Button bsStyle="primary" className="ml-1 mr-1" onClick={this.showAdditionalInfo.bind(this)}>
+                	<Button bsStyle="primary" className="ml-1 mr-1" onClick={this.showAdditionalInfo.bind(this)} disabled={this.props.is_initial}>
                     	{!this.state.showAdditional &&
 							'Show Additional Information'
 						}
@@ -51,7 +40,7 @@ class Header extends React.Component {
                     	Hide All
                     </Button>
                 </ButtonToolbar>
-				{this.state.showAdditional &&
+				{this.state.showAdditional && !this.props.is_initial &&
 					<div className="pt-4">
 						{this.props.additional}
 					</div>

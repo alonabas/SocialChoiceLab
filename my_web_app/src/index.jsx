@@ -86,10 +86,9 @@ class App extends React.Component {
 
 	
 	updateState(event){
-		let val = event.target.value;
-		val = Number(val);
+		let val = event.target.getAttribute('data-elem');
 		var state = this.state;
-		if (val == -1){
+		if (val == 'initial'){
 			state.is_initial = true;
 			this.setState(state)
 			return;

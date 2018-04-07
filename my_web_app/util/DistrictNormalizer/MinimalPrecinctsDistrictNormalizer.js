@@ -4,8 +4,6 @@ function MinimalPrecinctsDistrictNormalizer(prob = 0.9, allowedGap = 20){
     this.name = 'District Normalizer: Number of votes in each districts should be close (with diff up to'+allowedGap+')';
 	this.prob = prob;
 	this.allowedGap = allowedGap;
-	if (allowedGap > 20) this.allowedGap = 20
-
 
 	this.isNormalized = function(districts, data){
 		let totalPrecincts = districts.map(x=>(x.precincts.length)).reduce((xs,x)=>(xs+x),0);
