@@ -8,7 +8,6 @@ class Header extends React.Component {
 	
 	constructor(props){
 		super(props);
-		this.state = {showAdditional: false};
 	}
 
   	render () {
@@ -27,11 +26,11 @@ class Header extends React.Component {
             	<ButtonToolbar className='center-button-toolbar pt-3'>	
 					{buttonInitial}
 					{buttonNew}
-                	<Button bsStyle="primary" className="ml-1 mr-1" onClick={this.showAdditionalInfo.bind(this)} disabled={this.props.is_initial}>
-                    	{!this.state.showAdditional &&
+                	<Button bsStyle="primary" className="ml-1 mr-1" onClick={this.props.funcToShowAdditional} disabled={this.props.is_initial}>
+                    	{!this.props.showAdditional &&
 							'Show Additional Information'
 						}
-						{this.state.showAdditional &&
+						{this.props.showAdditional &&
 							'Hide Additional Information'
 						}
 
@@ -40,7 +39,7 @@ class Header extends React.Component {
                     	Hide All
                     </Button>
                 </ButtonToolbar>
-				{this.state.showAdditional && !this.props.is_initial &&
+				{this.props.showAdditional && !this.props.is_initial &&
 					<div className="pt-4">
 						{this.props.additional}
 					</div>
@@ -49,12 +48,6 @@ class Header extends React.Component {
     	);
 	}
 	  
-	showAdditionalInfo(){
-		let state = this.state;
-		state.showAdditional = !state.showAdditional;
-		this.setState(state);
-
-	}
 }
 
 Header.propTypes = {
@@ -63,7 +56,9 @@ Header.propTypes = {
 	title: PropTypes.string,
 	additional: PropTypes.string,
 	selectedResult: PropTypes.number,
-	fetchedResult: PropTypes.number
+	fetchedResult: PropTypes.number,
+	showAdditional: PropTypes.bool,
+	funcToShowAdditional: PropTypes.func
 }
 
 export default Header;

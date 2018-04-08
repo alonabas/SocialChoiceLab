@@ -22,7 +22,8 @@ class App extends React.Component {
 			changedPrecints:'',
 			isToUpdate: false,
 			selectedResultId:-1,
-			fetchedResultId:-1
+			fetchedResultId:-1,
+			showAdditional: false
         }
     }
 
@@ -72,11 +73,18 @@ class App extends React.Component {
 			let state = this.state;
 			console.log('Got response')
 			state.list_runs = responseJson;
+			state.selectedResultId = 0;
 			this.setState(state)
       })
       .catch((error) => {
         console.error(error);
       });
+	}
+
+	showAdditional(val){
+		let state = this.state;
+		state.showAdditional = !state.showAdditional;
+		this.setState(state);
 	}
 
     componentDidMount() {
@@ -109,11 +117,16 @@ class App extends React.Component {
 		if (this.state.is_initial){
 			json = this.state.old_json;
 		}
+		let top = 240;
+		if (this.state.showAdditional){
+			top = 290
+		}
         return (
             <div>
                 <Header title={this.state.title} is_initial={this.state.is_initial} handler={this.updateState.bind(this)} additional={this.state.changedPrecints}
-					selectedResult={this.state.selectedResultId} fetchedResult={this.state.fetchedResultId}/>
-				<span style={{top:'240px', position:'relative'}}>
+					selectedResult={this.state.selectedResultId} fetchedResult={this.state.fetchedResultId} showAdditional={this.state.showAdditional} 
+					funcToShowAdditional={this.showAdditional.bind(this)}/>
+				<span style={{top:top+'px', position:'relative'}}>
 				<ResultsList data={this.state.list_runs} passToButton={this.updateSelectedResult.bind(this)}/>
                 <Map is_initial={this.state.is_initial} districts={this.state.districts} isToUpdate={this.state.isToUpdate} resultId={this.state.fetchedResultId}/>
                 <ResultsTable districts={this.state.districts} json={json}/>
