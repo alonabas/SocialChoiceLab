@@ -267,6 +267,14 @@ module.exports.findNewDistrict = function(precinct, data){
 
 }
 
+module.exports.isPartitionLegal = function(districts){
+	let broken = districts.find(function(district){
+		return district.isBreaksConnection();
+	})
+	if (!broken || broken.length == 0) return true;
+	return false;
+}
+
 module.exports.getDistricsWithMinimalPrecincts = getDistricsWithMinimalPrecincts
 module.exports.isBorderPrecinct = isBorderPrecinct
 module.exports.copyDistrictToData = copyDistrictToData

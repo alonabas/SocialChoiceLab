@@ -90,12 +90,14 @@ function greedyAlgorithm(json, desiredCandidate, filename){
 		console.log('Number of changed precincts: '+changedPrecincts.length)
 		let winners = util.getWinners(districts).length;
 		if (winners >= numberOfDistrictsToWin && districNormalizerStrategy.isNormalized(districts, data)){
-			json.features = data;
-			console.log('DONEEE')
-			partititonFound = true;
-			// return;
-			util.saveAssignment(json, filename)
-			util.saveToLog(factory.logFile(), factory.discription(), districts);
+			if (util.isPartitionLegal(districts)){
+				json.features = data;
+				console.log('DONEEE')
+				partititonFound = true;
+				// return;
+				util.saveAssignment(json, filename)
+				util.saveToLog(factory.logFile(), factory.discription(), districts);
+			}
 		}
 		// return
 		i++;

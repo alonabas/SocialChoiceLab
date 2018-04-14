@@ -6,7 +6,7 @@
 		"_comment_1": "(1) - algorithm that takes partial partition of precincts and assigns the others based on some metric",
 		"params": {
 			"prob":{
-				"value": 0.7,
+				"value": 0.8,
 				"_comment": "Probability, exploration/exploitation factor"
 			},
 			"desiredCandidate": {
@@ -75,7 +75,7 @@
 		"_comment_1": "1 - assigns precincts until number of district in which our candidate wins gets below of required",
 		"params": {
 			"count":{
-				"value": 200,
+				"value": 220,
 				"_comment": "Maximal number precincts to assign"
 			}
 		}
