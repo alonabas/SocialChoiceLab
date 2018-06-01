@@ -10,7 +10,6 @@ function MinimalVotesDistrictNormalizer(prob, allowedGap=2000){
 		let minimalVoicesInDistrict = totalVoices/districts.length - this.allowedGap;
 		districts.sort((e1,e2)=>(e1.totalVotes - e2.totalVotes));
 		return districts[0].totalVotes > minimalVoicesInDistrict;
-
 	}
 
 	this.getDistrict = function(districts){

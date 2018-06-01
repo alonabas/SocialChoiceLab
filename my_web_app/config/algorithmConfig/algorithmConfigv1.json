@@ -10,9 +10,14 @@
 				"_comment": "Probability, exploration/exploitation factor"
 			},
 			"desiredCandidate": {
-				"value": 0,
+				"value": 1,
 				"_comment": "The party we want to win: 0 - republican party, 1 - democrat"
 			},
+			"maximalNumberOfChangedPrecincts": {
+				"value": 20,
+				"_comment": "Maximal number of precincts we can chnage, Only for algorithm (0)"
+			},
+
 			"numberOfDistrictsToWin": {
 				"value": 2,
 				"_comment": "Number of districts our candidate should win"
@@ -26,14 +31,17 @@
 				"_comment": "Recalculate what districts we are going to improve after each round"
 			},
 			"winningGap":{
-				"value": 5000,
+				"value": 500,
 				"_comment": "Minimal difference in number of votes in district for our candidate and for oponent to conclude that our candidate is winning"
 			},
 			"maximalNumberOfSteps":{
 				"value": 5000,
 				"_comment": "The maximal number of iterations to run, used for algorithm 0 only, "
-
-			}
+			},
+			"winnerConsideration":{
+				"value": false,
+				"_comment": "If true, the winner is one that have more than 50 percent, otherwise the winner is one that have maximal number of votes"
+			} 
 		}
 	},
 	"district_selection_strategy":{
@@ -57,10 +65,11 @@
 		"_comment_1": "1 - selects precicnt of maximal quality according to selected metric that was initially assigned to selected district"
 	},
 	"district_normalizer": {
-		"value":0,
+		"value":2,
 		"_comment": "District normalizing strategy, the metric used to define correct district partition",
 		"_comment_0": "number of votes in each district is closed up to some value",
 		"_comment_1": "number of precincts in each district is closed up to some value",
+		"_comment_2": "no normalization, stop when partition is found",
 		"params": {
 			"gap": {
 				"value": 2000,

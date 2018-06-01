@@ -1,14 +1,14 @@
 {
-    "state": "New Mexico",
+    "state": "Washington,9,8",
     "default_path": "./../states/",
-    "is_mapping_ready": true,
+    "is_neighbours_ready": true,
     "is_partition_ready": true,
-    "ready_data_path": "./../states/New Mexico/result.json",
-    "ready_partition_path": "./../states/New Mexico/partitions/",
+	"geo_json_path": "/election_geo.json",
+	"geo_json_path_neughbours": "/election_geo_neighbours.json",
+	"data_json_path": "/election_json_neighbours.json",
+    "ready_partition_path": "/partitions/",
     "ready_partition_name": "result",
-    "partition_file_to_use": "0",
-    "ready_geodata_path": "./../states/New Mexico/resultgeo.json",
-	"data_path": "./../states/New Mexico/data.json",
-	"log_path": "./../states/New Mexico/log.txt",
-	"alg_config_path": "./../config/algorithmConfig/algorithmConfigv2.json"
+    "partition_file_to_use": "0",    
+	"log_path": "/log.txt",
+	"alg_config_path": "./../config/algorithmConfig/algorithmConfigv1.json"
 }

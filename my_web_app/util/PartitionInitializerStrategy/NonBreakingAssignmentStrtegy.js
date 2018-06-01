@@ -5,9 +5,15 @@ function NonBreakingAssignmentStrtegy(prob=0.9, count=50){
 	this.maxCount = count
     this.isStop = function(districts, count, desiredCandidate){
 		var isNotWinning = function(element){
+			// console.log(element.isWinning)
+			// console.log(element.votes[desiredCandidate])
+			// console.log(element.votes[(desiredCandidate+1)%2])
+			// console.log('aa')
 			return element.isWinning && element.votes[desiredCandidate] < element.votes[(desiredCandidate+1)%2];
 		}
-		return (districts.some(isNotWinning) && count > this.maxCount) || count > (this.maxCount+50);
+		// console.log(districts.some(isNotWinning))
+		// console.log('aaaaddd')
+		return districts.some(isNotWinning) || count > (this.maxCount+50);
     }
 }
 module.exports.InitialAssignmentStrategy = NonBreakingAssignmentStrtegy

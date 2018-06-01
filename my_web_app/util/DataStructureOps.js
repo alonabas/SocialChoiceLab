@@ -18,10 +18,6 @@ module.exports.fixDistrict = function(data){
 		if (data){
 			entry.properties.uscong_dis = data.toString();
 		}
-		else{
-			console.log('No district for precinct '+ entry.properties.name);
-			console.log(entry.properties.all)
-		}
 		entry.properties.new_district = entry.properties.uscong_dis;
         return entry;
 	});
@@ -174,12 +170,12 @@ module.exports.isWinningPartitionFound = function(districts, desiredCandidate, n
 	else return false;
 }
 
-module.exports.createDistrictsArray = function(data, gap, isAssignInitial, desiredCandidate){
+module.exports.createDistrictsArray = function(data, gap, isAssignInitial, desiredCandidate, winnerConsideration){
 	var existingDistricts = getDistrictNames(data)
     var numberOfDistricts = existingDistricts.length
     var districts = [];
     existingDistricts.forEach(function(district){
-        var districtTemp = new DistrictObj.District(data, desiredCandidate, true, district, gap, isAssignInitial=isAssignInitial);
+        var districtTemp = new DistrictObj.District(data, desiredCandidate, true, district, gap, isAssignInitial=isAssignInitial, winnerConsideration);
         districts.push(districtTemp);
 	})
 	return districts
@@ -242,8 +238,9 @@ module.exports.saveToLog = function(logPath, description, districts){
 	}
 	else{
 		console.log('File doesnt exists')
-		var json = [{id:0, description: description, data:data}]
-		fs.writeFileSync(logPath, JSON.stringify(json), function(err){
+		console.log(logPath)
+		var json =  JSON.stringify([{id:0, description: description, data:data}])
+		fs.writeFileSync(logPath, json, function(err){
 			if(err) {
 				return console.log(err);
 			}
@@ -251,7 +248,7 @@ module.exports.saveToLog = function(logPath, description, districts){
 	}
 }
 
-module.exports.printDistricts = function(districts, data){
+module.exports.printDistricts = function(districts, data,){
     districts.forEach(function(district){
         district.print();
     })
@@ -267,13 +264,33 @@ module.exports.findNewDistrict = function(precinct, data){
 
 }
 
-module.exports.isPartitionLegal = function(districts){
+module.exports.isPartitionLegal = function(districts, isImportant = 1){
+	if (isImportant == 0) return true;
 	let broken = districts.find(function(district){
 		return district.isBreaksConnection();
 	})
 	if (!broken || broken.length == 0) return true;
 	return false;
 }
+
+module.exports.solveStuck = function(district, data, allDistricts){
+	let isSTuck = allDistricts.every(function(entry){
+		return entry.potentialPrecinctsToAdd.length == 0;
+	});
+	if (!isSTuck) return;
+	let filteredData = data.filter((entry)=>entry.properties.new_district === 'None' && entry.properties.uscong_dis === district.name);
+	if (filteredData.length == 0) return;
+	let selected = filteredData[Math.floor(Math.random() * filteredData.length)];
+	district.potentialPrecinctsToAdd.push(selected.properties.entryId);
+	// districts.map((entry)=>{
+	// 	if (entry.name === selected.properties.uscong_dis){
+	// 		entry.potentialPrecinctsToAdd.push(selected.properties.entryId);
+	// 	}
+	// 	return entry;
+	// })
+}
+
+
 
 module.exports.getDistricsWithMinimalPrecincts = getDistricsWithMinimalPrecincts
 module.exports.isBorderPrecinct = isBorderPrecinct

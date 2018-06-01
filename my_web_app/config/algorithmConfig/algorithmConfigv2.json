@@ -10,8 +10,12 @@
 				"_comment": "Probability, exploration/exploitation factor"
 			},
 			"desiredCandidate": {
-				"value": 0,
+				"value": 1,
 				"_comment": "The party we want to win: 0 - republican party, 1 - democrat"
+			},
+			"maximalNumberOfChangedPrecincts": {
+				"value": -1,
+				"_comment": "Maximal number of precincts we can chnage"
 			},
 			"numberOfDistrictsToWin": {
 				"value": 2,
@@ -26,18 +30,21 @@
 				"_comment": "Recalculate what districts we are going to improve after each round"
 			},
 			"winningGap":{
-				"value": 7000,
+				"value": 500,
 				"_comment": "Minimal difference in number of votes in district for our candidate and for oponent to conclude that our candidate is winning"
 			},
 			"maximalNumberOfSteps":{
 				"value": 5000,
 				"_comment": "The maximal number of iterations to run, used for algorithm 0 only, "
-
-			}
+			},
+			"winnerConsideration":{
+				"value": true,
+				"_comment": "If true, the winner is one that have more than 50 percent, otherwise the winner is one that have maximal number of votes"
+			} 
 		}
 	},
 	"district_selection_strategy":{
-		"value":2,
+		"value":1,
 		"_comment": "District selection strategy, the way algorithm will select the district at each step to add precincts to",
 		"_comment_0": "0-select district with maximal quality accordiing to provided metric in which our candidate loses",
 		"_comment_1": "1-select district with minimal number of votes",
@@ -51,7 +58,7 @@
 		"_comment_1": "1 - best precicnt is the one that has biggest percentage difference beetwen votes for our candidate and votes for oponent"
 	},
 	"precint_selector":{
-		"value":0,
+		"value":1,
 		"_comment": "Precinct selection strategy, the way algorithm selects what precicnt to add to selected district",
 		"_comment_0": "0 - select precinct of maximal quality according to selected metric",
 		"_comment_1": "1 - selects precicnt of maximal quality according to selected metric that was initially assigned to selected district"
@@ -61,9 +68,10 @@
 		"_comment": "District normalizing strategy, the metric used to define correct district partition",
 		"_comment_0": "number of votes in each district is closed up to some value",
 		"_comment_1": "number of precincts in each district is closed",
+		"_comment_2": "no normalization, stop when partition is found",
 		"params": {
 			"gap": {
-				"value": 20000,
+				"value": 10000,
 				"_comment": "Allowed number of precints/votes difference to be more/less than average"
 			}
 		}

@@ -1,7 +1,7 @@
 var config = require('../config/default')
 var algConfigPath = config.alg_config_path;
 var algorithmConfig = require(algConfigPath);
-
+var path = require('path');
 
 module.exports.algorithm = function(){
 	var algorithmRequire;
@@ -36,6 +36,14 @@ module.exports.winningGap = function(){
 
 module.exports.maximalNumberOfSteps = function(){
 	return algorithmConfig.algorithm.params.maximalNumberOfSteps.value;
+}
+
+module.exports.winnerConsideration = function(){
+	return algorithmConfig.algorithm.params.winnerConsideration.value;
+}
+
+module.exports.maximalNumberOfChangedPrecincts = function(){
+	return algorithmConfig.algorithm.params.maximalNumberOfChangedPrecincts.value;
 }
 
 module.exports.districtSelector = function(){
@@ -90,7 +98,8 @@ module.exports.winningAssignmentStrategy = function(){
 }
 
 module.exports.logFile = function(){
-	return config.log_path;
+	var logPath = path.join(__dirname, (config.default_path + config.state + config.ready_partition_path + config.log_path))
+	return logPath;
 }
 
 module.exports.discription = function(){
@@ -101,7 +110,7 @@ module.exports.discription = function(){
 		str += (algorithmConfig[attr]._comment +': '+ algorithmConfig[attr]['_comment_'+val])
 		if (algorithmConfig[attr].hasOwnProperty('params')){
 			let params = '';
-			str += '\n'
+			str += '.\t\n'
 			Object.keys(algorithmConfig[attr].params).forEach(function(param){
 				let val = algorithmConfig[attr].params[param].value;
 				params += ('\t'+ algorithmConfig[attr].params[param]._comment +': '+val+'\n')

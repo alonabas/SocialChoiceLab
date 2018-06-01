@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@turf/centroid": "^5.1.5",
-    "@turf/intersect": "^5.1.5",
+    "@turf/intersect": "^6.1.0",
     "@turf/turf": "^5.1.6",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
@@ -34,6 +34,10 @@
     "react-bootstrap-table-next": "^0.1.2",
     "react-dom": "^16.2.0",
     "style-loader": "^0.20.1",
+    "topojson-client": "^3.0.0",
+    "topojson-server": "^3.0.0",
+    "turf-intersect": "^3.0.12",
+    "turf-polygon": "^1.0.3",
     "vis": "^4.21.0",
     "webpack": "^3.10.0",
     "xtend": "^4.0.1"

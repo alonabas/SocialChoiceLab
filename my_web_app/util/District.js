@@ -1,6 +1,6 @@
 var ops = require('./DataStructureOps');
 
-function District(data, candidate, isWinning, name ,gap, isAssignInitial=false){
+function District(data, candidate, isWinning, name ,gap, isAssignInitial=false, winnerConsideration){
 	this.isAssignInitial = isAssignInitial;
     this.isWinning = isWinning;
     this.name = name;
@@ -10,6 +10,7 @@ function District(data, candidate, isWinning, name ,gap, isAssignInitial=false){
 	this.precincts = []
 	this.gap = gap;
 	this.candidate = candidate;
+	this.isWinnerMoreThan50 = winnerConsideration;
 
 	this.isConnectionBroken = function(){
 		let result = this.isBreaksConnection();
@@ -72,6 +73,7 @@ function District(data, candidate, isWinning, name ,gap, isAssignInitial=false){
 	};
 	
 	this.isWinner = function(){
+		if (this.isWinnerMoreThan50) return this.votes[this.candidate] > this.totalVotes/2 + this.gap;
 		return this.votes[this.candidate] > this.votes[(this.candidate+1)%2] + this.gap;
 	}
 
@@ -80,7 +82,7 @@ function District(data, candidate, isWinning, name ,gap, isAssignInitial=false){
         var percentDem = (((this.votes[1] * 1.0 )/this.totalVotes)*100).toFixed(2);
         var percentRep = (((this.votes[0] * 1.0 )/this.totalVotes)*100).toFixed(2);
         var str = 'District ' + this.name + ' winning '+this.isWinning+', Total Votes: '+this.totalVotes+', Votes for Republican: '+this.votes[0] + 
-        '(' + percentRep + '%), Votes for Democrat: '+ this.votes[0] + '(' + percentDem + '%).'
+        '(' + percentRep + '%), Votes for Democrat: '+ this.votes[1] + '(' + percentDem + '%).'
         if (this.votes[1] > this.votes[0]){
             str += 'Democrat won ' + (this.votes[1] - this.votes[0]) + ' more votes.'
         }
@@ -114,18 +116,25 @@ function District(data, candidate, isWinning, name ,gap, isAssignInitial=false){
 
     this.calculateNeighbours = function(data){
 		if (this.precincts.length == 0) return;
-		this.potentialPrecinctsToAdd = []
-        var that = this;
+		let potentialPrecinctsToAdd = []
+		var that = this;
         this.precincts.forEach(function(entry){
-            data[entry].properties.neighbours.forEach(function(neighbour){
-                if ((data[neighbour].properties.new_district == 'None' && !that.isAssignInitial) || (data[neighbour].properties.new_district != data[entry].properties.new_district && that.isAssignInitial)){
-                    if (that.potentialPrecinctsToAdd.indexOf(neighbour) == -1){
-						that.potentialPrecinctsToAdd.push(neighbour)
-					}
-						
-                }
-            })
+			if (data[entry].properties.neighbours && data[entry].properties.neighbours.length > 0){
+            	data[entry].properties.neighbours.forEach(function(neighbour){
+                	if ((data[neighbour].properties.new_district == 'None' && !that.isAssignInitial) || (data[neighbour].properties.new_district != data[entry].properties.new_district && that.isAssignInitial)){
+                    	if (potentialPrecinctsToAdd.indexOf(neighbour) == -1){
+							potentialPrecinctsToAdd.push(neighbour)
+						}	
+                	}
+				})
+			}
 		});
+		if (potentialPrecinctsToAdd && potentialPrecinctsToAdd.length > 0){
+			this.potentialPrecinctsToAdd = JSON.parse(JSON.stringify(potentialPrecinctsToAdd))
+		}
+		else{
+			this.potentialPrecinctsToAdd = this.potentialPrecinctsToAdd.filter((entry)=>that.precincts.indexOf(entry) === -1);
+		}
     };
 
 	this.getAllPotentialPrecinctsSorted = function(metric){
@@ -193,6 +202,17 @@ function District(data, candidate, isWinning, name ,gap, isAssignInitial=false){
             }).map(function(entry){
                 return parseInt(entry.properties.entryId);
 			});
+			let that = this
+			// this.potentialPrecinctsToAdd.forEach(function(entry){
+			// 	if (!data[entry].properties.neighbours || data[entry].properties.neighbours.length == 0){
+			// 		that.precincts.push(entry);
+			// 		data[entry].properties.new_district = that.name;
+			// 	}
+			// })
+			// this.potentialPrecinctsToAdd = this.potentialPrecinctsToAdd.filter(function(entry){
+			// 	return that.precincts.indexOf(entry) === -1;
+			// })
+			// console.log(': '+data.filter(entry=>entry.properties.new_district !== 'None').length)
             return;
         }
 	}
