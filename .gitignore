@@ -5,8 +5,8 @@ my_web_app/result.json
 my_web_app/dist/
 .DS_Store
 .idea/
+/states/election_neigbours_geo_one_to_use.json
 *.pyc
-*.py
 az_final.json
 az_precincts.geojson
 defaults.cfg

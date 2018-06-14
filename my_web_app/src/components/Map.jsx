@@ -8,16 +8,25 @@ class Map extends React.Component {
 
 	constructor(props, context){
 		super(props, context);
-		this.state = ({appliedLayer:''})
+		this.state = ({appliedLayer:'', isMapReady: false})
 	}
 	componentDidMount() {
 		mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiRy1GV1FoNCJ9.yUPu7qwD_Eqf_gKNzDrrCQ';
 		this.map = new mapboxgl.Map({
 			container: this.mapContainer,
 			style: "mapbox://styles/mapbox/outdoors-v9",
-			center: [-106, 34],
-			zoom: 5
+			center: [-95.5, 39.38],
+			zoom: 4
 		});
+		let that = this;
+		this.map.on('load', function(){
+			let state = that.state;
+			if (state.isRequestedUpdate){
+				that.update(that.props);
+			}
+			state.isMapReady = true;
+			that.setState(state);
+		})
 	}
 
 
@@ -75,18 +84,27 @@ class Map extends React.Component {
 	}
 
 
-	componentWillReceiveProps(nextProps) {
-		let that = this;
-		if (JSON.stringify(nextProps) == JSON.stringify(this.props)) return;
+	update(nextProps){
 		if (nextProps.isToUpdate == true && nextProps.is_initial){
 			this.tryCreateInitialLayers(nextProps.districts, -1)
 			this.applyMapLayer(nextProps.districts,-1);
-			return;
 		}
 		else if( nextProps.isToUpdate == true && nextProps.resultId > -1){
 			this.tryCreateInitialLayers(nextProps.districts, nextProps.resultId)
 			this.applyMapLayer(nextProps.districts,nextProps.resultId);
-			return;
+		}
+	}
+
+	componentWillReceiveProps(nextProps) {
+		let that = this;
+		if (JSON.stringify(nextProps) == JSON.stringify(this.props)) return;
+		if (that.state.isMapReady){
+			that.update(nextProps)	
+		}
+		else{
+			let state = that.state;
+			state.isRequestedUpdate = true;
+			that.setState(state)
 		}
 	}
 

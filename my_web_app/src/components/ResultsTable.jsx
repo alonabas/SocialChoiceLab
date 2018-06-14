@@ -54,7 +54,6 @@ class ResultsTable extends React.Component {
 		});
 		let state = this.state;
 		state.districts = districts;
-		console.log(state.districts)
 		this.setState(state)
 	}
 

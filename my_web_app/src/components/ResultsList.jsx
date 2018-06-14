@@ -1,7 +1,7 @@
 import React from 'react';
 import {render} from 'react-dom';
 import PropTypes from 'prop-types';
-
+import dateFormat from 'dateformat';
 
 class ResultsList extends React.Component {
 
@@ -47,6 +47,10 @@ class ResultsList extends React.Component {
 	getLi(elem, index){
 		let description = elem.data.description;
 		let descHtml = (<span>{description}</span>)
+		let date = 'unknown';
+		if (elem.data.date){
+			date = dateFormat(new Date(elem.data.date), "dd.mm.yyyy, hh:mm:ss");
+		}
 		if (!elem.open){
 			description = description.slice(0, Math.min(50, description.length))
 			descHtml = (<span>
@@ -57,11 +61,11 @@ class ResultsList extends React.Component {
 		return (
 			<div key={elem.data.id}>
 				<div className="row border-bottom">
-					<div className="col-2 border-left">
+					<div className="col-1 border-left">
             			<input type="radio" value={elem.data.id} checked={this.state.selectedOption === Number(elem.data.id)} 
 						 onChange={this.handleOptionChange.bind(this)}/>
           			</div>
-					<div className="col-2 border-left">{elem.data.id}</div>
+					<div className="col-3 border-left">{elem.data.id + ' ('+date+')'}</div>
 					<div className="col-8 border-left border-right">{descHtml}</div>
 				</div>
 			</div>

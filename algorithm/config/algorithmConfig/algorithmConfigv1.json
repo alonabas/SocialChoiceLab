@@ -1,0 +1,97 @@
+{
+	"algorithm":{
+		"value": 0,
+		"_comment": "Algorithm",
+		"_comment_0": "(0) - algorithm that runs on data and tries to move precicnts between districts",
+		"_comment_1": "(1) - algorithm that takes partial partition of precincts and assigns the others based on some metric",
+		"params": {
+			"prob":{
+				"value": 0.7,
+				"_comment": "Probability, exploration/exploitation factor"
+			},
+			"desiredCandidate": {
+				"value": 1,
+				"_comment": "The party we want to win: 0 - republican party, 1 - democrat"
+			},
+			"maximalNumberOfChangedPrecincts": {
+				"value": -1,
+				"_comment": "Maximal number of precincts we can chnage, Only for algorithm (0)"
+			},
+
+			"numberOfDistrictsToWin": {
+				"value": 2,
+				"_comment": "Number of districts our candidate should win"
+			},
+			"stepsBeforeNormalization":{
+				"value":400,
+				"_comment": "Number of steps to run before running size normalization"
+			},
+			"isToRecalculateWinner":{
+				"value": true,
+				"_comment": "Recalculate what districts we are going to improve after each round"
+			},
+			"winningGap":{
+				"value": 500,
+				"_comment": "Minimal difference in number of votes in district for our candidate and for oponent to conclude that our candidate is winning"
+			},
+			"maximalNumberOfSteps":{
+				"value": 5000,
+				"_comment": "The maximal number of iterations to run, used for algorithm 0 only, "
+			},
+			"winnerConsideration":{
+				"value": false,
+				"_comment": "If true, the winner is one that have more than 50 percent, otherwise the winner is one that have maximal number of votes"
+			} 
+		}
+	},
+	"district_selection_strategy":{
+		"value":2,
+		"_comment": "District selection strategy, the way algorithm will select the district at each step to add precincts to",
+		"_comment_0": "0-select district with maximal quality accordiing to provided metric in which our candidate loses",
+		"_comment_1": "1-select district with minimal number of votes",
+		"_comment_2": "2-select district with minimal number of precincts",
+		"_comment_3": "3-select random district"
+	},
+	"metric": {
+		"value":0,
+		"_comment": "Metric, the way the quality of preicnct is calculated",
+		"_comment_0": "0 - best precicnt is the one that has biggest difference beetwen votes for our candidate and votes for oponent",
+		"_comment_1": "1 - best precicnt is the one that has biggest percentage difference beetwen votes for our candidate and votes for oponent"
+	},
+	"precint_selector":{
+		"value":0,
+		"_comment": "Precinct selection strategy, the way algorithm selects what precicnt to add to selected district",
+		"_comment_0": "0 - select precinct of maximal quality according to selected metric",
+		"_comment_1": "1 - selects precicnt of maximal quality according to selected metric that was initially assigned to selected district"
+	},
+	"district_normalizer": {
+		"value":2,
+		"_comment": "District normalizing strategy, the metric used to define correct district partition",
+		"_comment_0": "number of votes in each district is closed up to some value",
+		"_comment_1": "number of precincts in each district is closed up to some value",
+		"_comment_2": "no normalization, stop when partition is found",
+		"params": {
+			"gap": {
+				"value": 2000,
+				"_comment": "Allowed number of precints/votes difference to be more/less than median number"
+			}
+		}
+	},
+	"initial_assignment_strategy": {
+		"value":0,
+		"_comment": "Initial precinct assignment strategy, used only for algorithm type 1",
+		"_comment_0": "0 - assigns some constant number of precincts to their districts",
+		"_comment_1": "1 - assigns precincts until number of district in which our candidate wins gets below of required",
+		"params": {
+			"count":{
+				"value": 300,
+				"_comment": "Maximal number precincts to assign"
+			}
+		}
+	},
+	"winning_assignment_strategy": {
+		"value":0,
+		"_comment": "Winning district assignment strategy, select which district are going to be treated as winning by our candidate and which are losing",
+		"_comment_0": "0 - district with it's initila precincts with highest quality according to selected metrict are going to be assigned as winners"
+	}
+}

@@ -33,11 +33,7 @@ class Header extends React.Component {
 						{this.props.showAdditional &&
 							'Hide Additional Information'
 						}
-
                 	</Button>
-                	<Button bsStyle="primary" className="ml-1 mr-1">
-                    	Hide All
-                    </Button>
                 </ButtonToolbar>
 				{this.props.showAdditional && !this.props.is_initial &&
 					<div className="pt-4">

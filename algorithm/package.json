@@ -1,0 +1,14 @@
+{
+  "name": "precinct_election_algorithm",
+  "version": "1.0.0",
+  "description": "Election to House of Representatives 2016",
+  "main": "server.js",
+  "author": "Alona",
+  "license": "MIT",
+  "dependencies": {
+    "@turf/centroid": "^5.1.5",
+    "jquery": "^3.2.1",
+    "topojson-client": "^3.0.0",
+    "topojson-server": "^3.0.0"
+  }
+}

@@ -28,12 +28,10 @@ class App extends React.Component {
     }
 
 	featchAndUpdate(query, callback) {
-		console.log('fetch called')
 		let id = this.state.selectedResultId;
 		if (id !== -1) query = query+'?id='+id;
 		return fetch(query).then((response) => response.json()).then((responseJson) => {
 			let state = this.state;
-			console.log('Got response')
 			if (responseJson.old) state.old_json = responseJson.old;
 			if (responseJson.new_json) state.new_json = responseJson.new_json;
 			if (responseJson.title) {
@@ -58,7 +56,6 @@ class App extends React.Component {
 				})
 				state.changedPrecints = 'Precincts that changed their district '+count + ' from '+state.new_json.features.length+'.';
 			}
-			console.log('HEEEE')
 			
 			if (callback) callback(state, this)
 			this.setState(state)
@@ -71,7 +68,6 @@ class App extends React.Component {
 	fetchList(query) {
 		return fetch("getListOfResults").then((response) => response.json()).then((responseJson) => {
 			let state = this.state;
-			console.log('Got response')
 			state.list_runs = responseJson;
 			state.selectedResultId = 0;
 			this.setState(state)

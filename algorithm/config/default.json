@@ -1,0 +1,14 @@
+{
+    "state": "Washington,9,8",
+    "default_path": "./../states/",
+    "is_neighbours_ready": false,
+    "is_partition_ready": false,
+	"geo_json_path": "/election_geo.json",
+	"geo_json_path_neughbours": "/election_geo_neighbours.json",
+	"data_json_path": "/election_json_neighbours.json",
+    "ready_partition_path": "/partitions/",
+    "ready_partition_name": "result",
+    "partition_file_to_use": "0",    
+	"log_path": "/log.txt",
+	"alg_config_path": "./../config/algorithmConfig/algorithmConfigv2.json"
+}
