@@ -1,6 +1,6 @@
 # Social Choice Lab
 
-**Consists from 3 projects:**
+**Consists of 3 projects:**
 1. [Data Parser](data_parser/)
 2. [Neighbours Finder + Algorithm](algorithm/)
 3. [Web application](web_app)
@@ -23,11 +23,12 @@ If you want to generate data from some new state/set of districts:
 3. Exectute an algorithm - with with [Neighbours Fainder + Algorithm](algorithm/) project.
 4. Visualize your results with [Web application](web_app)
 
+:grey_exclamation: **Election Object:**
 <a id="election_object"></a>
 ``` 
 {
-candidate: <candidate name> ,// optional
-party_name: <rep or dem>,
-votes: <number of votes for this candidate>,
+	candidate: <candidate name> ,// optional
+	party_name: <rep or dem>,
+	votes: <number of votes for this candidate>,
 }
 ```
