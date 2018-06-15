@@ -2,7 +2,7 @@
 
 **Consists from 3 projects:**
 1. [Data Parser](data_parser/)
-2. [Neighbours Fainder + Algorithm](algorithm/)
+2. [Neighbours Finder + Algorithm](algorithm/)
 3. [Web application](web_app)
 
 If you want to generate data from some new state/set of districts:
@@ -19,13 +19,15 @@ If you want to generate data from some new state/set of districts:
 	* field total - total number of votes in precinct
 	* field entryId - is an identification number of precinct in the features array (i.e ``` geoJson.features[j].entryId = j``` )
    - The result of this step is redy geojson with election data
-2. For each feature in geojson (precinct) find the list of it's neighboring precincts - with [Neighbours Fainder + Algorithm](algorithm/).
+2. For each feature in geojson (precinct) find the list of it's neighboring precincts - with [Neighbours Finder + Algorithm](algorithm/).
 3. Exectute an algorithm - with with [Neighbours Fainder + Algorithm](algorithm/) project.
 4. Visualize your results with [Web application](web_app)
 
-#election_object
-``` { ```
-```candidate: ``` <candidate name> ```,// optional```
-```party_name:``` <rep or dem> ```,```
-```votes:``` <# of votes for this candidate> ```,```
-```}```
+<a id="election_object"></a>
+``` 
+{
+candidate: <candidate name> ,// optional
+party_name: <rep or dem>,
+votes: <number of votes for this candidate>,
+}
+```
