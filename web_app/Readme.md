@@ -1,7 +1,8 @@
 # Social Choice Lab: Project 3
-# Web application
+**Web application**
 
-## Javascript project 
+## Project description
+- Javascript project
 - Presents the results of the algorithm in readable and clear format. 
 - Uses [Map API](https://www.mapbox.com) to visualize different district partitions.
 
