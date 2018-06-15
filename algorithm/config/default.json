@@ -1,14 +1,38 @@
 {
-    "state": "Washington,9,8",
-    "default_path": "./../states/",
-    "is_neighbours_ready": false,
-    "is_partition_ready": false,
+	"state": "Washington,9,8",
+	"_comment": "Change the state after you run data_parse on desired state, state name is the same as the folder name",
+
+	"default_path": "./../states/",
+	"_comment": "There is no need to change this value",
+
+	"is_neighbours_ready": false,
+	"_comment": "Change this to true if yoy would like to find neighbor precincts in your geojson",
+
+	"is_partition_ready": false,
+	"_comment": "Change this to true if yoy would like to run an algorithm, before you are doing this validate that each precinct has neighbours in the json file you are using",
+	
 	"geo_json_path": "/election_geo.json",
+	"_comment": "There is no need to change this value, this file is created by data_parser",
+
 	"geo_json_path_neughbours": "/election_geo_neighbours.json",
+	"_comment": "There is no need to change this value, if you do so please change it also in configuration of web_app",
+
 	"data_json_path": "/election_json_neighbours.json",
-    "ready_partition_path": "/partitions/",
-    "ready_partition_name": "result",
-    "partition_file_to_use": "0",    
+	"_comment": "There is no need to change this value, if you do so please change it also in configuration of web_app",
+
+	"ready_partition_path": "/partitions/",
+	"_comment": "There is no need to change this value, if you do so please change it also in configuration of web_app",
+
+	"ready_partition_name": "result",
+	"_comment": "There is no need to change this value, if you do so please change it also in configuration of web_app",
+
+	"partition_file_to_use": "0",    
+	"_comment": "There is no need to change this value, if you do so please change it also in configuration of web_app",
+
 	"log_path": "/log.txt",
-	"alg_config_path": "./../config/algorithmConfig/algorithmConfigv2.json"
+	"_comment": "There is no need to change this value, if you do so please change it also in configuration of web_app, log file used to save different properties of current result",
+	
+	"alg_config_path": "./../config/algorithmConfig/algorithmConfigv2.json",
+	"_comment": "There are two versions of algorithm, here you specify the one you would like to use, inside this file you can change algorithm configuration"
+
 }

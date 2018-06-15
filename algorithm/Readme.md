@@ -7,5 +7,8 @@
 ## Steps:
 1. Install nodeJS and npm
 2. ``` npm install ```
-3. Change the [configuration file](config/default.json) with your configuration (you can find the description inside configuration file)
+3. Change the [configuration file](config/default.json) with your configuration (you can find the description inside configuration file under "_comment" key)
 4. ```node server.js```
+
+:thought_balloon:\:
+Two possible algorithm configurations can be found [here](config/algorithmConfig) and there is the "_comment" key to help you to match the algorithm to your needs
