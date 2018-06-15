@@ -10,5 +10,6 @@
 3. Change the [configuration file](config/default.json) with your configuration (you can find the description inside configuration file under "_comment" key)
 4. ```node server.js```
 
-:thought_balloon:\:
-Two possible algorithm configurations can be found [here](config/algorithmConfig) and there is the "_comment" key to help you to match the algorithm to your needs
+:thought_balloon:
+
+**Two available algorithm configurations can be found [here](config/algorithmConfig) and you can see under each configuration key also "_comment" key that will help you to adjust the algorithm to your needs.**
