@@ -1,0 +1,13 @@
+{
+    "state": "New Mexico",
+    "default_path": "./../states/",
+    "is_neighbours_ready": true,
+    "is_partition_ready": true,
+	"geo_json_path": "/election_geo.json",
+	"data_json_path": "/election_json_neighbours.json",
+    "ready_partition_path": "/partitions/",
+    "ready_partition_name": "result",
+    "partition_file_to_use": "0",    
+	"log_path": "/log.txt",
+	"port": 3001
+}
